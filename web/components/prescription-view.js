@@ -1,0 +1,8 @@
+(() => {
+  const ns = globalThis.GuildBookUI ||= {};
+  const fmt = value => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value);
+  ns.builderItem = (item, index, editing) => `<article class="card builder-item" data-index="${index}">
+    <div class="builder-item-top"><div><span class="section-kicker">${ns.escape(globalThis.GuildBookCore.prescription.routeName(item.route))}</span><h2>${ns.escape(item.label)}</h2><p>${ns.escape(item.instruction)}</p><small>${item.durationDays ? `${item.durationDays} ${item.durationDays === 1 ? 'dia' : 'dias'}` : 'Sem duração definida'} · ${item.quantity == null ? 'Quantidade pendente' : `${fmt(item.quantity)} ${ns.escape(globalThis.GuildBookCore.prescription.abbreviation(item.quantityUnit))}`}</small></div><div class="builder-item-actions"><button type="button" data-edit-index="${index}">Editar</button><button type="button" data-remove-index="${index}">Remover</button></div></div>
+    ${editing ? `<div class="builder-edit"><label class="field"><span class="field-label">Duração em dias (opcional)</span><input name="days" type="number" min="1" max="${item.durationKind === 'max7' ? 7 : 365}" step="1" value="${item.durationDays ?? ''}"></label><label class="field"><span class="field-label">Quantidade a dispensar (opcional)</span><input name="quantity" type="number" min="0.01" step="0.01" value="${item.quantityMethod === 'manual' ? item.quantity ?? '' : ''}"><small>Em branco: recalcular pela duração quando possível.</small></label><button type="button" class="primary-button" data-save-index="${index}">Salvar</button></div>` : ''}
+  </article>`;
+})();

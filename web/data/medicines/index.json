@@ -1,0 +1,4 @@
+[
+  {"id":"dipirona","name":"Dipirona","aliases":["metamizol","novalgina"],"file":"dipirona.json"},
+  {"id":"cetoprofeno","name":"Cetoprofeno","aliases":["profenid","ketoprofen"],"file":"cetoprofeno.json"}
+]
