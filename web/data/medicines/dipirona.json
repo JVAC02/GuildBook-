@@ -1,0 +1,54 @@
+{
+  "id": "dipirona",
+  "name": "Dipirona",
+  "aliases": ["metamizol", "novalgina"],
+  "category": "Analgésico e antitérmico",
+  "class": "Derivado pirazolônico",
+  "brands": ["Novalgina"],
+  "indications": ["Dor", "Febre"],
+  "presentations": [
+    {
+      "id": "dip-500", "label": "Dipirona 500 mg — comprimido", "form": "comprimido", "concentration": "500 mg", "releaseType": "imediata", "route": "oral", "context": "ambulatory", "packageSizes": [30, 100], "sourceIds": ["novalgina-tablets"],
+      "regimens": [{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":500},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 g/dia (8 comprimidos de 500 mg).","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}]
+    },
+    {
+      "id": "dip-1000", "label": "Dipirona 1 g — comprimido", "form": "comprimido", "concentration": "1 g", "releaseType": "imediata", "route": "oral", "context": "ambulatory", "packageSizes": [10, 20], "sourceIds": ["novalgina-tablets"],
+      "regimens": [{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":1000},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 g/dia (4 comprimidos de 1 g).","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}]
+    },
+    {
+      "id": "dip-drops", "label": "Dipirona 500 mg/mL — gotas", "form": "solução oral em gotas", "concentration": "500 mg/mL · 25 mg/gota", "releaseType": "imediata", "route": "oral", "context": "ambulatory", "packageSizes": [10, 20], "packageUnit": "mL", "sourceIds": ["ache-drops"],
+      "regimens": [
+        {"id":"adult","population":"adult","dose":{"kind":"fixed","units":20,"unit":"gotas","mg":500,"volumeMl":1},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 40 gotas por dose, 4 vezes ao dia.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"},
+        {"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"gotas","mgPerUnit":25,"unitsPerMl":20,"minAgeMonths":3,"maxAgeMonths":180,"bands":[{"minKg":5,"maxKg":8,"minUnits":2,"maxUnits":5},{"minKg":9,"maxKg":15,"minUnits":3,"maxUnits":10},{"minKg":16,"maxKg":23,"minUnits":5,"maxUnits":15},{"minKg":24,"maxKg":30,"minUnits":8,"maxUnits":20},{"minKg":31,"maxKg":45,"minUnits":10,"maxUnits":30},{"minKg":46,"maxKg":53,"minUnits":15,"maxUnits":35}]},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 tomadas/dia; limite por dose conforme faixa de peso da bula.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}
+      ]
+    },
+    {
+      "id": "dip-solution", "label": "Dipirona 50 mg/mL — solução oral", "form": "solução oral", "concentration": "50 mg/mL", "releaseType": "imediata", "route": "oral", "context": "ambulatory", "packageSizes": [100], "packageUnit": "mL", "sourceIds": ["ache-solution"],
+      "regimens": [
+        {"id":"adult","population":"adult","dose":{"kind":"fixed","units":10,"unit":"mL","mg":500,"volumeMl":10},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 20 mL por dose, 4 vezes ao dia.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"},
+        {"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"mL","mgPerUnit":50,"minAgeMonths":3,"maxAgeMonths":180,"bands":[{"minKg":5,"maxKg":8,"minUnits":1.25,"maxUnits":2.5},{"minKg":9,"maxKg":15,"minUnits":2.5,"maxUnits":5},{"minKg":16,"maxKg":23,"minUnits":3.75,"maxUnits":7.5},{"minKg":24,"maxKg":30,"minUnits":5,"maxUnits":10},{"minKg":31,"maxKg":45,"minUnits":7.5,"maxUnits":15},{"minKg":46,"maxKg":53,"minUnits":8.75,"maxUnits":17.5}]},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 tomadas/dia; limite por dose conforme faixa de peso da bula.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}
+      ]
+    },
+    {
+      "id": "dip-im", "label": "Dipirona 500 mg/mL — IM", "form": "solução injetável", "concentration": "500 mg/mL", "releaseType": "imediata", "route": "intramuscular", "context": "urgent", "packageSizes": [], "sourceIds": ["hypofarma-injectable"],
+      "regimens": [
+        {"id":"adult","population":"adult","dose":{"kind":"fixed","units":2,"unit":"mL","mg":1000},"intervalText":"dose única; repetição conforme avaliação, máximo 10 mL/dia","routeText":"via intramuscular","maxDoseText":"10 mL/dia (5 g/dia).","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"},
+        {"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"mL","mgPerUnit":500,"minAgeMonths":3,"maxAgeMonths":180,"bands":[{"minKg":5,"maxKg":8,"minUnits":0.1,"maxUnits":0.2},{"minKg":9,"maxKg":15,"minUnits":0.2,"maxUnits":0.5},{"minKg":16,"maxKg":23,"minUnits":0.3,"maxUnits":0.8},{"minKg":24,"maxKg":30,"minUnits":0.4,"maxUnits":1},{"minKg":31,"maxKg":45,"minUnits":0.5,"maxUnits":1.5},{"minKg":46,"maxKg":53,"minUnits":0.8,"maxUnits":1.8}]},"intervalText":"até 4 vezes ao dia, se necessário","routeText":"via intramuscular","maxDoseText":"Até 4 administrações/dia, respeitando a faixa de peso.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}
+      ]
+    },
+    {
+      "id": "dip-iv", "label": "Dipirona 500 mg/mL — IV", "form": "solução injetável", "concentration": "500 mg/mL", "releaseType": "imediata", "route": "intravenosa", "context": "hospital", "packageSizes": [], "sourceIds": ["hypofarma-injectable"], "preparation": "Administração IV muito lenta, no máximo 1 mL (500 mg) por minuto; paciente deitado e sob supervisão.",
+      "regimens": [
+        {"id":"adult","population":"adult","dose":{"kind":"fixed","units":2,"unit":"mL","mg":1000},"intervalText":"dose única; repetição conforme avaliação, máximo 10 mL/dia","routeText":"via intravenosa","maxDoseText":"10 mL/dia (5 g/dia).","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"},
+        {"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"mL","mgPerUnit":500,"minAgeMonths":12,"maxAgeMonths":180,"bands":[{"minKg":9,"maxKg":15,"minUnits":0.2,"maxUnits":0.5},{"minKg":16,"maxKg":23,"minUnits":0.3,"maxUnits":0.8},{"minKg":24,"maxKg":30,"minUnits":0.4,"maxUnits":1},{"minKg":31,"maxKg":45,"minUnits":0.5,"maxUnits":1.5},{"minKg":46,"maxKg":53,"minUnits":0.8,"maxUnits":1.8}]},"intervalText":"até 4 vezes ao dia, se necessário","routeText":"via intravenosa","maxDoseText":"Até 4 administrações/dia, respeitando a faixa de peso.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}
+      ]
+    }
+  ],
+  "safety": ["Contraindicada em hipersensibilidade à dipirona/pirazolonas, discrasias sanguíneas, porfiria aguda ou deficiência de G6PD.", "Atenção a agranulocitose, anafilaxia e reações cutâneas graves; interromper diante de sinais sugestivos.", "Evitar doses altas em insuficiência renal ou hepática; avaliar idosos e pacientes debilitados.", "No uso parenteral, monitorar hipotensão e anafilaxia. Gestação e lactação exigem avaliação específica."],
+  "sources": [
+    {"id":"novalgina-tablets","label":"Novalgina — bula profissional, comprimidos","url":"https://uploads.consultaremedios.com.br/drug_leaflet/pro/Bula-Novalgina-Comprimido-Profissional-Consulta-Remedios.pdf"},
+    {"id":"ache-drops","label":"Aché — bula, gotas 500 mg/mL","url":"https://www.ache.com.br/wp-content/uploads/application/pdf/bula-paciente-dipirona-monoidratada-gotas.pdf"},
+    {"id":"ache-solution","label":"Aché — bula, solução oral 50 mg/mL","url":"https://www.ache.com.br/wp-content/uploads/application/pdf/bula-paciente-dipirona-monoidratada-solucao-oral.pdf"},
+    {"id":"hypofarma-injectable","label":"Hypofarma — bula profissional, injetável 500 mg/mL","url":"https://hypofarma.com.br/wp-content/uploads/2025/08/dipirona_Bula_Profissional1.pdf"}
+  ]
+}

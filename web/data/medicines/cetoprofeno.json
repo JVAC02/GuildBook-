@@ -1,0 +1,55 @@
+{
+  "id": "cetoprofeno",
+  "name": "Cetoprofeno",
+  "aliases": ["profenid", "ketoprofen"],
+  "category": "Analgésico e anti-inflamatório",
+  "class": "Anti-inflamatório não esteroidal (AINE)",
+  "brands": ["Profenid"],
+  "indications": ["Dor musculoesquelética", "Inflamação", "Dor pós-operatória"],
+  "presentations": [
+    {
+      "id":"keto-50","label":"Cetoprofeno 50 mg — cápsula","form":"cápsula","concentration":"50 mg","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[24],"sourceIds":["profenid"],
+      "regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"cápsula","mg":50},"intervalHours":8,"intervalText":"a cada 8 horas","routeText":"via oral","maxDoseText":"300 mg/dia; usar a menor dose eficaz pelo menor tempo necessário.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]
+    },
+    {
+      "id":"keto-100","label":"Cetoprofeno 100 mg — comprimido entérico","form":"comprimido revestido","concentration":"100 mg","releaseType":"retardada (entérica)","route":"oral","context":"ambulatory","packageSizes":[20],"sourceIds":["profenid"],
+      "regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":100},"intervalHours":12,"intervalText":"a cada 12 horas","routeText":"via oral","maxDoseText":"300 mg/dia; usar a menor dose eficaz pelo menor tempo necessário.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]
+    },
+    {
+      "id":"keto-150","label":"Cetoprofeno 150 mg — liberação prolongada","form":"comprimido de duas camadas","concentration":"150 mg","releaseType":"prolongada","route":"oral","context":"ambulatory","packageSizes":[10],"sourceIds":["eurofarma-150"],
+      "regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":150},"intervalHours":24,"intervalText":"uma vez ao dia","routeText":"via oral","maxDoseText":"300 mg/dia; esquema de manutenção de 150 mg/dia.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]
+    },
+    {
+      "id":"keto-200","label":"Cetoprofeno 200 mg — liberação retardada","form":"comprimido revestido","concentration":"200 mg","releaseType":"retardada","route":"oral","context":"ambulatory","packageSizes":[10],"sourceIds":["profenid"],
+      "regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":200},"intervalHours":24,"intervalText":"uma vez ao dia","routeText":"via oral","maxDoseText":"1 comprimido de 200 mg/dia para esta apresentação.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]
+    },
+    {
+      "id":"keto-drops","label":"Cetoprofeno 20 mg/mL — gotas","form":"solução oral em gotas","concentration":"20 mg/mL · 1 mg/gota","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[20],"packageUnit":"mL","sourceIds":["eurofarma-drops"],
+      "regimens":[
+        {"id":"adult","population":"adult","dose":{"kind":"fixed","units":50,"unit":"gotas","mg":50,"volumeMl":2.5},"intervalHours":8,"intervalText":"a cada 8 horas","routeText":"via oral","maxDoseText":"300 mg/dia (300 gotas).","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"},
+        {"id":"pediatric","population":"pediatric","dose":{"kind":"ageWeightDrops","unit":"gotas","mgPerUnit":1,"unitsPerMl":20,"unitsPerKg":1,"minAgeMonths":12,"maxAgeMonths":144,"fixedFromMonths":84,"fixedUnits":25},"intervalHours":8,"intervalText":"a cada 8 horas","routeText":"via oral","maxDoseText":"Conferir peso, faixa etária e necessidade clínica; bula: a cada 6 ou 8 horas.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}
+      ]
+    },
+    {
+      "id":"keto-gel","label":"Cetoprofeno 25 mg/g — gel","form":"gel","concentration":"25 mg/g","releaseType":"tópica","route":"tópica","context":"ambulatory","packageSizes":[30],"packageUnit":"g","sourceIds":["medley-gel"],
+      "regimens":[{"id":"adult","population":"adult","dose":{"kind":"topical","unit":"g"},"intervalText":"2 a 3 vezes ao dia, massageando levemente","routeText":"uso tópico","maxDoseText":"Até 15 g/dia; tratamento por no máximo 7 dias.","durationKind":"max7","quantityKind":"variable","verb":"Aplicar"}]
+    },
+    {
+      "id":"keto-im","label":"Cetoprofeno 100 mg/2 mL — IM","form":"solução injetável","concentration":"50 mg/mL","releaseType":"imediata","route":"intramuscular","context":"urgent","packageSizes":[],"sourceIds":["cristalia-im"],"preparation":"Aplicar profundamente por via IM; não misturar com outros medicamentos na mesma seringa.",
+      "regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"ampola","mg":100},"intervalText":"2 vezes ao dia; pode ser 3 vezes a critério médico","routeText":"via intramuscular","maxDoseText":"300 mg/dia.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}]
+    },
+    {
+      "id":"keto-iv","label":"Cetoprofeno 100 mg — IV","form":"pó liofilizado para solução injetável","concentration":"100 mg/frasco","releaseType":"imediata","route":"intravenosa","context":"hospital","packageSizes":[],"sourceIds":["cristalia-iv"],"preparation":"Dissolver 100 mg em 100–150 mL de solução isotônica de glicose ou cloreto de sódio imediatamente antes do uso; infundir lentamente em cerca de 20 minutos. Administrar separadamente de outros medicamentos.",
+      "regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"frasco-ampola","mg":100},"intervalText":"100 a 300 mg ao dia conforme avaliação","routeText":"via intravenosa","maxDoseText":"300 mg/dia; em cólica renal, no máximo 48 horas.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}]
+    }
+  ],
+  "safety":["Contraindicado em hipersensibilidade a cetoprofeno, AAS ou outros AINEs; úlcera/hemorragia péptica e insuficiência cardíaca, renal ou hepática grave.","Evitar no terceiro trimestre de gestação. Avaliar gestação anterior e lactação individualmente.","Risco de sangramento gastrintestinal, lesão renal e interações com outros AINEs ou anticoagulantes; monitorar pacientes vulneráveis.","Gel: evitar exposição solar na área tratada e pele lesada; respeitar limite de 7 dias da bula consultada."],
+  "sources":[
+    {"id":"profenid","label":"Sanofi — Profenid, bula profissional (cápsula, entérico e retard)","url":"https://uploads.consultaremedios.com.br/drug_leaflet/pro/Bula-Profenid-Profissional-Consulta-Remedios.pdf"},
+    {"id":"eurofarma-150","label":"Eurofarma — cetoprofeno 150 mg, bula profissional","url":"https://eurofarma.com.br/produtos/bulas/view/healthcare/pt/bula-cetoprofeno-comprimido.html"},
+    {"id":"eurofarma-drops","label":"Eurofarma — cetoprofeno gotas, bula profissional","url":"https://eurofarma.com.br/produtos/bulas/view/healthcare/pt/bula-cetoprofeno-solucao-oral-gotas.html"},
+    {"id":"medley-gel","label":"Medley — cetoprofeno gel, bula profissional","url":"https://uploads.consultaremedios.com.br/drug_leaflet/pro/Bula-Cetoprofeno-Gel-Medley-Profissional-Consulta-Rem%C3%A9dios.pdf"},
+    {"id":"cristalia-im","label":"Cristália — cetoprofeno IM, bula profissional","url":"https://www.cristalia.com.br/index.php/produto/61/bula-profissional"},
+    {"id":"cristalia-iv","label":"Cristália — cetoprofeno IV, bula profissional","url":"https://www.cristalia.com.br/produto/62/bula-profissional"}
+  ]
+}
