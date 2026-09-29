@@ -175,7 +175,7 @@ try {
   assert.match(await page.locator('#clinical-output').innerText(), /500 mg/);
   await noOverflow();
   assert.deepEqual(errors, []);
-  console.log('Browser E2E: todos os cenários passaram; 9 capturas reais salvas em', output);
+  console.log('Browser E2E: todos os cenários passaram; 10 capturas reais salvas em', output);
 } finally {
   await browser.close();
 }
