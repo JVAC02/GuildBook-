@@ -9,6 +9,9 @@
   const savedContext = core.storage.get(patientContextKey, {});
   const state = { view: 'home', medicineId: null, presentationId: null, population: savedContext?.population === 'pediatric' ? 'pediatric' : 'adult', query: '', ageMonths: String(savedContext?.ageMonths ?? ''), weightKg: String(savedContext?.weightKg ?? ''), chosenUnits: '', days: '', mode: 'none', packSize: '', manualQuantity: '', showDispenseOptions: false, items: Array.isArray(savedItems) ? savedItems.filter(item => item && typeof item.key === 'string' && typeof item.instruction === 'string') : [], patientName: '', printDetails: {}, editIndex: null };
   let catalog = [];
+  let conditions = [];
+  let clinicalIndex = { medicationsByCondition: {}, calculatorsByCondition: {} };
+  let calculators = [];
   const cache = new Map();
   const inline = globalThis.__GB_DATA__;
   const data = async path => inline ? inline[path] : (await fetch(path)).json();
@@ -39,13 +42,38 @@
   }
   function cards() {
     const items = listingItems();
-    return items.length ? items.map(item => ui.medicationCard(item, core.favorites.has(item.id))).join('') : `<div class="empty">${state.view === 'favorites' && !state.query ? 'Nenhum favorito ainda. Toque na estrela de um medicamento para salvá-lo.' : 'Nenhum medicamento encontrado.'}</div>`;
+    return items.length ? items.map(item => ui.medicationCard(item, core.favorites.has(item.id))).join('') : state.query && hasClinicalMatches() ? '' : `<div class="empty">${state.view === 'favorites' && !state.query ? 'Nenhum favorito ainda. Toque na estrela de um medicamento para salvá-lo.' : 'Nenhum medicamento encontrado.'}</div>`;
+  }
+  function conditionMatches() { return state.view === 'favorites' ? [] : core.clinicalAssociation.searchConditions(conditions, state.query); }
+  function calculatorMatches() { return state.view === 'favorites' ? [] : core.clinicalAssociation.searchCalculators(calculators, state.query); }
+  function hasClinicalMatches() { return conditionMatches().length > 0 || calculatorMatches().length > 0; }
+  function clinicalResults() {
+    const conditionResults = conditionMatches();
+    const calculatorResults = calculatorMatches();
+    const conditionsHtml = conditionResults.length ? `<section class="condition-results" aria-label="Condições encontradas"><div class="section-kicker">CONDIÇÕES E ÍNDICES</div><div class="condition-result-grid">${conditionResults.map(ui.clinicalConditionCard).join('')}</div></section>` : '';
+    const calculatorsHtml = calculatorResults.length ? `<section class="condition-results" aria-label="Ferramentas encontradas"><div class="section-kicker">FERRAMENTAS</div><div class="tool-grid">${calculatorResults.map(ui.calculatorCard).join('')}</div></section>` : '';
+    return conditionsHtml + calculatorsHtml;
   }
   function renderListing() {
     const home = state.view === 'home';
-    const hero = home ? `<section class="hero"><div class="hero-content"><div class="eyebrow">CONSULTA RÁPIDA · APRESENTAÇÃO POR APRESENTAÇÃO</div><h1>Informação clínica<br>na medida certa.</h1><p>Encontre o medicamento, escolha a apresentação e veja apenas o esquema correspondente.</p><div class="search-wrap"><input id="search" class="search-input" type="search" placeholder="Buscar medicamento ou nome comercial..." autocomplete="off" value="${ui.escape(state.query)}" aria-label="Buscar medicamento"></div><div class="home-actions"><button data-view="medications">Medicamentos</button><button data-view="favorites">Favoritos</button></div></div></section>` : `<div class="breadcrumbs"><button data-view="home">Início</button><span>›</span><span>${state.view === 'favorites' ? 'Favoritos' : 'Medicamentos'}</span></div><h1 class="page-title">${state.view === 'favorites' ? 'Favoritos' : 'Medicamentos'}</h1><div class="search-wrap" style="margin-top:18px"><input id="search" class="search-input" type="search" placeholder="Buscar medicamento..." value="${ui.escape(state.query)}" aria-label="Buscar medicamento"></div>`;
+    const hero = home ? `<section class="hero"><div class="hero-content"><div class="eyebrow">CONSULTA RÁPIDA · APRESENTAÇÃO POR APRESENTAÇÃO</div><h1>Informação clínica<br>na medida certa.</h1><p>Encontre o medicamento, escolha a apresentação e veja apenas o esquema correspondente.</p><div class="search-wrap"><input id="search" class="search-input" type="search" placeholder="Buscar medicamento, condição ou sigla..." autocomplete="off" value="${ui.escape(state.query)}" aria-label="Buscar medicamento ou condição"></div><div class="home-actions"><button data-view="medications">Medicamentos</button><button data-view="favorites">Favoritos</button></div></div></section>` : `<div class="breadcrumbs"><button data-view="home">Início</button><span>›</span><span>${state.view === 'favorites' ? 'Favoritos' : 'Medicamentos'}</span></div><h1 class="page-title">${state.view === 'favorites' ? 'Favoritos' : 'Medicamentos'}</h1><div class="search-wrap" style="margin-top:18px"><input id="search" class="search-input" type="search" placeholder="Buscar medicamento${state.view === 'favorites' ? '' : ', condição ou sigla'}..." value="${ui.escape(state.query)}" aria-label="Buscar medicamento${state.view === 'favorites' ? '' : ' ou condição'}"></div>`;
     const patientContext = `<div class="library-context"><div class="segment library-population" role="group" aria-label="Contexto da biblioteca"><button type="button" data-library-population="adult" class="${state.population === 'adult' ? 'active' : ''}" aria-pressed="${state.population === 'adult'}">Adulto</button><button type="button" data-library-population="pediatric" class="${state.population === 'pediatric' ? 'active' : ''}" aria-pressed="${state.population === 'pediatric'}">Pediatria</button></div>${state.population === 'pediatric' ? `<div class="patient-context-panel" id="patient-context"><strong>Contexto do paciente (pediatria)</strong><div class="patient-context-fields"><label for="patient-age-months"><span>Idade (meses)</span><input id="patient-age-months" type="number" min="0" step="1" inputmode="numeric" value="${ui.escape(state.ageMonths)}" placeholder="Ex.: 48"></label><label for="patient-weight-kg"><span>Peso (kg)</span><input id="patient-weight-kg" type="number" min="0.1" step="0.1" inputmode="decimal" value="${ui.escape(state.weightKg)}" placeholder="Ex.: 18"></label></div></div>` : ''}</div>`;
-    shell(`${hero}<div class="section-top"><div><div class="section-kicker">${state.view === 'favorites' ? 'SUA LISTA' : 'BIBLIOTECA CLÍNICA'}</div><h2>${home ? 'Medicamentos disponíveis' : state.view === 'favorites' ? 'Seus favoritos' : 'Escolha um medicamento'}</h2></div>${patientContext}<p>${catalog.length} ${catalog.length === 1 ? 'medicamento' : 'medicamentos'}</p></div><div class="med-grid" id="med-grid">${cards()}</div>`);
+    const hideMedications = state.query && hasClinicalMatches() && !listingItems().length;
+    shell(`${hero}<div id="clinical-results">${clinicalResults()}</div><div id="medication-results" ${hideMedications ? 'hidden' : ''}><div class="section-top"><div><div class="section-kicker">${state.view === 'favorites' ? 'SUA LISTA' : 'BIBLIOTECA CLÍNICA'}</div><h2>${home ? 'Medicamentos disponíveis' : state.view === 'favorites' ? 'Seus favoritos' : 'Escolha um medicamento'}</h2></div>${patientContext}<p>${catalog.length} ${catalog.length === 1 ? 'medicamento' : 'medicamentos'}</p></div><div class="med-grid" id="med-grid">${cards()}</div></div>`);
+  }
+  function renderCondition() {
+    const condition = conditions.find(row => row.id === state.conditionId);
+    if (!condition) return setView('home');
+    const resources = core.clinicalAssociation.resourcesFor(condition.id, clinicalIndex, catalog, calculators);
+    shell(`<div class="breadcrumbs"><button data-view="home">Início</button><span>›</span><span>${ui.escape(condition.name)}</span></div>${ui.clinicalCondition(condition, resources, id => core.favorites.has(id))}`);
+  }
+  function openCondition(id) {
+    if (!conditions.some(row => row.id === id)) return;
+    state.view = 'condition';
+    state.conditionId = id;
+    location.hash = `#condition/${id}`;
+    renderCondition();
+    window.scrollTo(0, 0);
   }
   async function loadMedicine(id) {
     if (!cache.has(id)) {
@@ -165,6 +193,7 @@
   function route() {
     const parts = location.hash.replace(/^#/, '').split('/');
     if (parts[0] === 'medicine' && catalog.some(item => item.id === parts[1])) return openMedicine(parts[1], parts[2], parts[3]);
+    if (parts[0] === 'condition' && conditions.some(item => item.id === parts[1])) return openCondition(parts[1]);
     state.view = ['medications', 'favorites', 'builder'].includes(parts[0]) ? parts[0] : 'home';
     state.medicineId = null;
     if (state.view === 'builder') renderBuilder(); else renderListing();
@@ -174,8 +203,10 @@
     if (view) return setView(view.dataset.view);
     const open = event.target.closest('[data-open]');
     if (open) return openMedicine(open.dataset.open);
+    const condition = event.target.closest('[data-condition]');
+    if (condition) return openCondition(condition.dataset.condition);
     const favorite = event.target.closest('[data-favorite]');
-    if (favorite) { core.favorites.toggle(favorite.dataset.favorite); return state.view === 'medicine' ? renderMedicine() : renderListing(); }
+    if (favorite) { core.favorites.toggle(favorite.dataset.favorite); return state.view === 'medicine' ? renderMedicine() : state.view === 'condition' ? renderCondition() : renderListing(); }
     const pop = event.target.closest('[data-library-population]');
     if (pop) { state.population = pop.dataset.libraryPopulation; savePatientContext(); return renderListing(); }
     if (event.target.id === 'alter-quantity') { state.showDispenseOptions = true; return renderDynamic(); }
@@ -213,7 +244,7 @@
     if (event.target.id === 'print-builder') window.print();
   });
   root.addEventListener('input', event => {
-    if (event.target.id === 'search') { state.query = event.target.value; document.querySelector('#med-grid').innerHTML = cards(); }
+    if (event.target.id === 'search') { state.query = event.target.value; document.querySelector('#clinical-results').innerHTML = clinicalResults(); document.querySelector('#med-grid').innerHTML = cards(); document.querySelector('#medication-results').hidden = !!state.query && hasClinicalMatches() && listingItems().length === 0; }
     if (event.target.id === 'duration') { state.days = event.target.value; if (state.mode !== 'manual') { state.mode = 'none'; state.packSize = ''; state.showDispenseOptions = false; } renderDynamic(); }
     if (event.target.id === 'patient-age-months') { state.ageMonths = event.target.value; savePatientContext(); }
     if (event.target.id === 'patient-weight-kg') { state.weightKg = event.target.value; savePatientContext(); }
@@ -230,9 +261,17 @@
   window.addEventListener('hashchange', () => {
     const parts = location.hash.replace(/^#/, '').split('/');
     if (parts[0] === 'medicine' && state.view === 'medicine' && parts[1] === state.medicineId && parts[2] === state.presentationId && parts[3] === state.population) return;
-    if (parts[0] !== state.view || (parts[0] === 'medicine' && (parts[2] !== state.presentationId || parts[3] !== state.population))) route();
+    if (parts[0] !== state.view || (parts[0] === 'medicine' && (parts[2] !== state.presentationId || parts[3] !== state.population)) || (parts[0] === 'condition' && parts[1] !== state.conditionId)) route();
   });
-  (async () => { catalog = await data('data/medicines/index.json'); route(); })().catch(error => { console.error(error); root.innerHTML = '<main class="page"><h1>Não foi possível carregar o catálogo</h1><p>Abra o arquivo standalone ou use a prévia local.</p></main>'; });
+  (async () => {
+    [catalog, conditions, clinicalIndex, calculators] = await Promise.all([
+      data('data/medicines/index.json'),
+      data('data/clinical/conditions.json'),
+      data('data/clinical/index.json'),
+      data('data/calculators/index.json'),
+    ]);
+    route();
+  })().catch(error => { console.error(error); root.innerHTML = '<main class="page"><h1>Não foi possível carregar o catálogo</h1><p>Abra o arquivo standalone ou use a prévia local.</p></main>'; });
 })();
 
 

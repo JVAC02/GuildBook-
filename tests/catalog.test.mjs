@@ -18,5 +18,7 @@ test('standalone export includes a newly registered medicine without script chan
     const html = await readFile(join(root, 'GuildBook-Core-v7.html'), 'utf8');
     assert.match(html, /new-drug\.json/);
     assert.match(html, /Medicamento novo/);
+    assert.match(html, /data\/clinical\/index\.json/);
+    assert.match(html, /medicationsByCondition/);
   } finally { await rm(root, { recursive: true, force: true }); }
 });

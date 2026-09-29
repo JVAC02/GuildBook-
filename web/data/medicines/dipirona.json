@@ -5,7 +5,10 @@
   "category": "Analgésico e antitérmico",
   "class": "Derivado pirazolônico",
   "brands": ["Novalgina"],
-  "indications": ["Dor", "Febre"],
+  "clinicalRelations": [
+    { "conditionId": "dor", "type": "symptomatic", "sourceIds": ["ache-drops"] },
+    { "conditionId": "febre", "type": "symptomatic", "sourceIds": ["ache-drops"] }
+  ],
   "presentations": [
     {
       "id": "dip-500", "label": "Dipirona 500 mg — comprimido", "form": "comprimido", "concentration": "500 mg", "releaseType": "imediata", "route": "oral", "context": "ambulatory", "packageSizes": [30, 100], "sourceIds": ["novalgina-tablets"],

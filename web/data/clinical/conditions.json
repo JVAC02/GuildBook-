@@ -1,0 +1,7 @@
+[
+  { "id": "dor", "name": "Dor", "aliases": [] },
+  { "id": "febre", "name": "Febre", "aliases": [] },
+  { "id": "dor-musculoesqueletica", "name": "Dor musculoesquelética", "aliases": [] },
+  { "id": "dor-pos-operatoria", "name": "Dor pós-operatória", "aliases": [] },
+  { "id": "inflamacao", "name": "Inflamação", "aliases": [] }
+]

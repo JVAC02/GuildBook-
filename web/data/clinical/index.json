@@ -1,0 +1,27 @@
+{
+  "medicationsByCondition": {
+    "dor": [
+      "dipirona",
+      "cetoprofeno"
+    ],
+    "febre": [
+      "dipirona"
+    ],
+    "dor-musculoesqueletica": [
+      "cetoprofeno"
+    ],
+    "dor-pos-operatoria": [
+      "cetoprofeno"
+    ],
+    "inflamacao": [
+      "cetoprofeno"
+    ]
+  },
+  "calculatorsByCondition": {
+    "dor": [],
+    "febre": [],
+    "dor-musculoesqueletica": [],
+    "dor-pos-operatoria": [],
+    "inflamacao": []
+  }
+}

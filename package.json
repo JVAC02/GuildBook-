@@ -3,10 +3,11 @@
   "private": true,
   "version": "7.0.0",
   "scripts": {
-    "test": "node tests/core.test.mjs && node tests/dispensing.test.mjs && node tests/builder.test.mjs && node tests/catalog.test.mjs",
-    "test:browser": "node tests/browser.e2e.mjs && node tests/builder.browser.e2e.mjs",
+    "test": "node scripts/clinical-index.mjs --check && node tests/core.test.mjs && node tests/dispensing.test.mjs && node tests/builder.test.mjs && node tests/catalog.test.mjs && node tests/clinical-index.test.mjs && node tests/clinical-search.test.mjs && node tests/clinical-view.test.mjs",
+    "test:browser": "node tests/browser.e2e.mjs && node tests/builder.browser.e2e.mjs && node tests/clinical.browser.e2e.mjs",
     "preview": "node scripts/preview.mjs",
     "build": "npm run export:standalone",
-    "export:standalone": "node scripts/export-standalone.mjs"
+    "export:standalone": "node scripts/export-standalone.mjs",
+    "clinical:index": "node scripts/clinical-index.mjs"
   }
 }
