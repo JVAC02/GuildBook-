@@ -6,10 +6,7 @@
     return medicine.presentations.filter(item => item.regimens.some(row => {
       if (row.population !== population) return false;
       if (population !== 'pediatric') return true;
-      const dose = row.dose;
-      if (Number.isFinite(ageMonths) && (ageMonths < (dose.minAgeMonths || 0) || (dose.maxAgeMonths != null && ageMonths >= dose.maxAgeMonths))) return false;
-      if (dose.kind === 'weightBands' && Number.isFinite(weightKg) && !dose.bands.some(band => weightKg >= band.minKg && weightKg <= band.maxKg)) return false;
-      return true;
+      return ns.pediatric.eligible(item, row, { ageMonths, weightKg });
     }));
   }
   function regimen(item, population, id) { return item.regimens.find(row => row.population === population && (!id || row.id === id)) || null; }

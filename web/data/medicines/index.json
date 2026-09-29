@@ -1,4 +1,4 @@
 [
-  {"id":"dipirona","name":"Dipirona","aliases":["metamizol","novalgina"],"file":"dipirona.json"},
-  {"id":"cetoprofeno","name":"Cetoprofeno","aliases":["profenid","ketoprofen"],"file":"cetoprofeno.json"}
+  {"id":"dipirona","name":"Dipirona","summary":"Analgésico · antitérmico","aliases":["metamizol","novalgina"],"file":"dipirona.json"},
+  {"id":"cetoprofeno","name":"Cetoprofeno","summary":"AINE · analgésico","aliases":["profenid","ketoprofen"],"file":"cetoprofeno.json"}
 ]

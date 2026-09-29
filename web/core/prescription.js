@@ -13,16 +13,9 @@
       : `${item.verb} ${doseAmount(item.dose.units)} ${abbreviation(item.dose.unit)} ${interval}`;
     return `${use}${item.durationDays ? ` por ${item.durationDays} ${item.durationDays === 1 ? 'dia' : 'dias'}` : ''}${asNeeded ? ' se necessário' : ''}.`.toUpperCase();
   }
-  function automaticQuantity(item, days) {
-    if (!days || item.quantityKind === 'variable' || item.quantityKind === 'facility' || !item.intervalHours) return null;
-    const unitsPerMl = item.dose.unit === 'gotas' ? item.dose.units / item.dose.volumeMl : undefined;
-    return ns.quantity.calculate({ units: item.dose.units, unit: item.dose.unit, unitsPerMl, intervalHours: item.intervalHours, days, packSize: item.packSize });
-  }
-  function createItem({ medicine, presentation, regimen, dose, days, quantity, mode = 'exact', manualQuantity, packSize }) {
-    if (!medicine || !presentation || !regimen || !dose || presentation.context !== 'ambulatory') return null;
+  function createItem({ medicine, presentation, regimen, dose, days, dispensing }) {
+    if (!medicine || !presentation || !regimen || !dose || presentation.context !== 'ambulatory' || !dispensing || !(dispensing.quantity > 0)) return null;
     const durationDays = Number.isInteger(Number(days)) && Number(days) > 0 && Number(days) <= (regimen.durationKind === 'max7' ? 7 : 365) ? Number(days) : null;
-    const manual = Number(manualQuantity);
-    const selectedQuantity = mode === 'manual' && manual > 0 ? manual : mode === 'pack' ? quantity?.closedPack ?? null : quantity?.required ?? null;
     const item = {
       key: `${medicine.id}/${presentation.id}/${regimen.id}`, medicineId: medicine.id, medicineName: medicine.name,
       presentationId: presentation.id, regimenId: regimen.id, population: regimen.population,
@@ -30,20 +23,22 @@
       route: presentation.route, dose: { units: dose.units, unit: dose.unit, mg: dose.mg, volumeMl: dose.volumeMl ?? null },
       intervalText: regimen.intervalText, intervalHours: regimen.intervalHours ?? null,
       durationKind: regimen.durationKind, quantityKind: regimen.quantityKind, verb: regimen.verb || 'Tomar',
-      durationDays, quantity: selectedQuantity, quantityUnit: quantity?.unit || presentation.packageUnit || (dose.unit === 'gotas' ? 'mL' : dose.unit),
-      packSize: Number(packSize || presentation.packageSizes[0]) || null,
-      quantityMethod: mode === 'manual' && manual > 0 ? 'manual' : mode === 'pack' ? 'pack' : 'automatic'
+      durationDays, quantity: dispensing.quantity, quantityUnit: dispensing.unit, quantityText: dispensing.text,
+      quantityMethod: dispensing.method, packageSizes: presentation.packageSizes || [], packageUnit: presentation.packageUnit || null,
+      packageSizeUnit: presentation.packageSizeUnit || null, quantityPolicy: presentation.quantityPolicy || null,
+      canFractionate: presentation.canFractionate === true
     };
     item.instruction = instruction(item);
     return item;
   }
   function updateItem(item, { days, quantity }) {
     const durationDays = Number.isInteger(Number(days)) && Number(days) > 0 && Number(days) <= (item.durationKind === 'max7' ? 7 : 365) ? Number(days) : null;
-    const manual = quantity === '' ? null : Number(quantity);
-    const calculated = automaticQuantity(item, durationDays);
-    const method = manual > 0 ? 'manual' : item.quantityMethod === 'pack' ? 'pack' : 'automatic';
-    const updated = { ...item, durationDays, quantity: manual > 0 ? manual : method === 'pack' ? calculated?.closedPack ?? null : calculated?.required ?? null,
-      quantityUnit: calculated?.unit || item.quantityUnit, quantityMethod: method };
+    const presentation = { packageSizes: item.packageSizes || [], packageUnit: item.packageUnit, packageSizeUnit: item.packageSizeUnit, quantityPolicy: item.quantityPolicy, canFractionate: item.canFractionate };
+    const regimen = { quantityKind: item.quantityKind, intervalHours: item.intervalHours, durationKind: item.durationKind };
+    const plan = ns.quantity.plan({ presentation, regimen, dose: item.dose, days: durationDays });
+    const dispensing = quantity !== '' ? ns.quantity.select(plan, { kind: 'manual', amount: Number(quantity) }) : durationDays ? ns.quantity.select(plan, { kind: 'suggested' }) : item.quantityMethod === 'confirmed-package' ? { quantity: item.quantity, unit: item.quantityUnit, text: item.quantityText, method: item.quantityMethod } : null;
+    if (!dispensing) return null;
+    const updated = { ...item, durationDays, quantity: dispensing.quantity, quantityUnit: dispensing.unit, quantityText: dispensing.text, quantityMethod: dispensing.method };
     updated.instruction = instruction(updated);
     return updated;
   }
@@ -68,7 +63,7 @@
     for (const route of routes) {
       parts.push(routeName(route), '');
       items.filter(item => item.route === route).forEach((item, index) => {
-        const amount = item.quantity == null ? 'QTDE A DEFINIR' : `${number(item.quantity)} ${abbreviation(item.quantityUnit)}`;
+        const amount = item.quantityText ? item.quantityText.toUpperCase() : item.quantity == null ? 'QUANTIDADE PENDENTE' : ns.quantity.measure(item.quantity, item.quantityUnit).toUpperCase();
         const name = `${index + 1}. ${prescriptionName(item).toUpperCase()}`;
         const dashes = '-'.repeat(Math.max(4, 40 - name.length - 2));
         parts.push(`${name} ${dashes} ${amount}`, `   ${item.instruction}`, '');

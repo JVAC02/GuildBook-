@@ -7,6 +7,7 @@ const { chromium } = await import(process.env.GUILDBOOK_PLAYWRIGHT || 'playwrigh
 const browser = await chromium.launch({ headless: true, ...(process.env.GUILDBOOK_BROWSER ? { executablePath: process.env.GUILDBOOK_BROWSER } : {}) });
 const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, permissions: ['clipboard-read', 'clipboard-write'] });
 const page = await context.newPage();
+page.setDefaultTimeout(5000);
 const errors = [];
 page.on('pageerror', error => errors.push(error.message));
 page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
@@ -68,20 +69,26 @@ try {
   assert.equal(await page.locator('#age').count(), 0);
   assert.equal(await page.locator('#weight').count(), 0);
   assert.equal(await page.getByText('Indicação clínica').count(), 0);
+  assert.equal(await page.locator('#add-builder').isEnabled(), false);
+  assert.deepEqual(await page.locator('input[name="dispense"][value="package"]').evaluateAll(nodes => nodes.map(node => Number(node.dataset.packageSize))), [30, 100]);
+  assert.equal(await page.locator('input[name="dispense"]:checked').count(), 0);
+  await page.locator('input[name="dispense"][data-package-size="30"]').check();
+  assert.equal(await page.locator('#add-builder').isEnabled(), true);
   await duration(10);
   assert.match(await page.locator('#quantity-output').innerText(), /40 comprimidos/);
+  assert.match(await page.locator('#quantity-output').innerText(), /60 comprimidos/);
   assert.equal(await page.getByText('Texto para prescrição').count(), 0);
   await shot('02-desktop-dipirona-500-adulto.png');
   await duration(5);
   assert.match(await page.locator('#quantity-output').innerText(), /20 comprimidos/);
-  await page.getByLabel('Modo de dispensação').locator('input[value="pack"]').check();
   assert.match(await page.locator('#quantity-output').innerText(), /30 comprimidos/);
+  await page.locator('#alter-quantity').click();
   await page.locator('input[value="manual"]').check();
   await page.locator('#manual-quantity').fill('25');
   await page.locator('#manual-quantity').press('Tab');
-  assert.match(await page.locator('#quantity-output').innerText(), /25 comprimidos/);
-  await page.locator('#restore-auto').click();
-  assert.match(await page.locator('#quantity-output').innerText(), /20 comprimidos/);
+  assert.equal(await page.locator('#add-builder').isEnabled(), true);
+  await page.locator('input[value="suggested"]').check();
+  assert.match(await page.locator('#quantity-output').innerText(), /30 comprimidos/);
   await page.locator('#add-builder').click();
   assert.match(await page.locator('.desktop-nav [data-view="builder"]').innerText(), /1/);
 
@@ -102,6 +109,7 @@ try {
   assert.match(await page.locator('#clinical-output').innerText(), /3–10 gotas/);
   await duration(10);
   assert.match(await page.locator('#quantity-output').innerText(), /6 mL/);
+  assert.match(await page.locator('#quantity-output').innerText(), /10 mL/);
   await shot('04-desktop-dipirona-pediatria.png');
 
   await open('cetoprofeno', 'keto-50');
@@ -111,9 +119,10 @@ try {
   assert.match(await page.locator('#quantity-output').innerText(), /48 cápsulas/);
   await shot('05-desktop-cetoprofeno-oral.png');
   await page.locator('#presentation').selectOption('keto-gel');
-  assert.match(await page.locator('#quantity-output').innerText(), /Conforme área tratada/);
+  assert.match(await page.locator('#quantity-output').innerText(), /30 g/);
   assert.equal(await page.locator('[data-population]').count(), 0);
-  await duration(7);
+  assert.equal(await page.locator('#add-builder').isEnabled(), false);
+  await page.locator('input[name="dispense"][data-package-size="30"]').check();
   assert.equal(await page.locator('#add-builder').isEnabled(), true);
   await page.locator('#presentation').selectOption('keto-drops');
   await page.locator('.breadcrumbs [data-view="medications"]').click();

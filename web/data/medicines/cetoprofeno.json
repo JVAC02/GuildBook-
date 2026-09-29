@@ -31,7 +31,7 @@
       ]
     },
     {
-      "id":"keto-gel","label":"Cetoprofeno 25 mg/g — gel","form":"gel","concentration":"25 mg/g","releaseType":"tópica","route":"tópica","context":"ambulatory","packageSizes":[30],"packageUnit":"g","sourceIds":["medley-gel"],
+      "id":"keto-gel","label":"Cetoprofeno 25 mg/g — gel","form":"gel","concentration":"25 mg/g","releaseType":"tópica","route":"tópica","context":"ambulatory","packageSizes":[30],"packageUnit":"bisnaga","packageSizeUnit":"g","quantityPolicy":"manual","sourceIds":["medley-gel"],
       "regimens":[{"id":"adult","population":"adult","dose":{"kind":"topical","unit":"g"},"intervalText":"2 a 3 vezes ao dia, massageando levemente","routeText":"uso tópico","maxDoseText":"Até 15 g/dia; tratamento por no máximo 7 dias.","durationKind":"max7","quantityKind":"variable","verb":"Aplicar"}]
     },
     {

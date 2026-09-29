@@ -5,6 +5,7 @@ import '../web/core/quantity.js';
 import '../web/core/pediatric.js';
 import '../web/core/medication.js';
 import '../web/core/prescription.js';
+import '../web/components/medication-card.js';
 
 const root = new URL('../web/data/medicines/', import.meta.url);
 const dip = JSON.parse(readFileSync(new URL('dipirona.json', root)));
@@ -48,6 +49,26 @@ test('pediatric presentations are selected by confirmed regimen, including solid
   assert.equal(medication.presentationsForPopulation(dip, 'pediatric', { ageMonths: 6, weightKg: 6 }).some(item => item.id === 'dip-im'), true);
 });
 
+test('presentation metadata constrains pediatric eligibility without inferring a regimen', () => {
+  const regimen = { id: 'child', population: 'pediatric', dose: { kind: 'perKg', unit: 'comprimido' } };
+  const solid = { id: 'child-solid', form: 'comprimido', pediatric: { pediatricAllowed: true, minAgeMonths: 72, minWeightKg: 20, maxWeightKg: 40, doseKind: 'perKg', dosePerKg: 10, strengthMg: 100, canSplit: false, sourceIds: ['confirmed'] }, regimens: [regimen] };
+  const withoutRegimen = { ...solid, id: 'unsupported', regimens: [{ population: 'adult', dose: { kind: 'fixed', units: 1, unit: 'comprimido', mg: 100 } }] };
+  const medicine = { presentations: [solid, withoutRegimen] };
+  assert.deepEqual(medication.presentationsForPopulation(medicine, 'pediatric', { ageMonths: 96, weightKg: 20 }).map(item => item.id), ['child-solid']);
+  assert.deepEqual(medication.presentationsForPopulation(medicine, 'pediatric', { ageMonths: 60, weightKg: 20 }), []);
+  assert.deepEqual(medication.presentationsForPopulation(medicine, 'pediatric', { ageMonths: 96, weightKg: 15 }), []);
+  assert.deepEqual(medication.presentationsForPopulation(medicine, 'pediatric', { ageMonths: 96, weightKg: 41 }), []);
+  assert.deepEqual(pediatric.resolve(regimen, { ageMonths: 96, weightKg: 20 }, solid), { units: 2, mg: 200, unit: 'comprimido' });
+  assert.equal(pediatric.resolve(regimen, { ageMonths: 96, weightKg: 25 }, solid), null, 'whole tablet cannot be split without authorization');
+  const splittable = { ...solid, pediatric: { ...solid.pediatric, canSplit: true, allowedFractions: [0.5] } };
+  assert.deepEqual(pediatric.resolve(regimen, { ageMonths: 96, weightKg: 25 }, splittable), { units: 2.5, mg: 250, unit: 'comprimido' });
+  assert.equal(pediatric.resolve(regimen, { ageMonths: 96, weightKg: 23 }, splittable), null, 'unconfirmed fraction is rejected');
+  assert.equal(pediatric.resolve(regimen, { ageMonths: 96, weightKg: 25 }, { ...splittable, pediatric: { ...splittable.pediatric, mustSwallowWhole: true } }), null);
+  const fixed = { population: 'pediatric', dose: { kind: 'fixed', unit: 'comprimido' } };
+  assert.deepEqual(pediatric.resolve(fixed, { ageMonths: 96 }, { pediatric: { fixedDose: 100, strengthMg: 100 } }), { units: 1, mg: 100, unit: 'comprimido' });
+  assert.equal(pediatric.resolve(fixed, { ageMonths: 96 }, { pediatric: { fixedDose: 50, strengthMg: 100 } }), null);
+});
+
 test('duration calculates exact and closed pack quantities', () => {
   assert.deepEqual(quantity.calculate({ units: 1, unit: 'cápsula', intervalHours: 8, days: 10, packSize: 24 }), { required: 30, closedPack: 48, packs: 2, unit: 'cápsula' });
   assert.equal(quantity.calculate({ units: 1, unit: 'comprimido', intervalHours: 6, days: 0 }), null);
@@ -57,13 +78,20 @@ test('duration calculates exact and closed pack quantities', () => {
 test('as-needed instruction retains the selected regimen and duration', () => {
   const p = medication.presentation(dip, 'dip-500');
   const regimen = medication.regimen(p, 'adult');
-  const q = quantity.calculate({ units: 1, unit: 'comprimido', intervalHours: 6, days: 5, packSize: 30 });
-  const item = prescription.createItem({ medicine: dip, presentation: p, regimen, dose: regimen.dose, days: 5, quantity: q });
+  const plan = quantity.plan({ presentation: p, regimen, dose: regimen.dose, days: 5 });
+  const item = prescription.createItem({ medicine: dip, presentation: p, regimen, dose: regimen.dose, days: 5, dispensing: quantity.select(plan, { kind: 'suggested' }) });
   assert.match(item.instruction, /DE 6\/6H POR 5 DIAS SE NECESSÁRIO\./);
-  assert.equal(item.quantity, 20);
+  assert.equal(item.quantity, 30);
 });
 
 test('search ranks exact medicine ahead of aliases', () => {
   assert.equal(medication.search([keto, dip], 'dipirona')[0].id, 'dipirona');
   assert.equal(medication.search([dip, keto], 'cetoprofeno')[0].id, 'cetoprofeno');
+});
+
+test('a new catalog entry renders from data without medicine-specific UI rules', () => {
+  const card = globalThis.GuildBookUI.medicationCard({ id: 'new-drug', name: 'Medicamento novo', summary: 'Descrição confirmada' }, false);
+  assert.match(card, /Me/);
+  assert.match(card, /Descrição confirmada/);
+  assert.match(card, /data-open="new-drug"/);
 });
