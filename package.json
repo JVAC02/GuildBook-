@@ -3,7 +3,7 @@
   "private": true,
   "version": "7.0.0",
   "scripts": {
-    "test": "node tests/core.test.mjs && node tests/builder.test.mjs",
+    "test": "node tests/core.test.mjs && node tests/dispensing.test.mjs && node tests/builder.test.mjs && node tests/catalog.test.mjs",
     "test:browser": "node tests/browser.e2e.mjs && node tests/builder.browser.e2e.mjs",
     "preview": "node scripts/preview.mjs",
     "build": "npm run export:standalone",

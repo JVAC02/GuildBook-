@@ -2,6 +2,13 @@
   const ns = globalThis.GuildBookCore ||= {};
   function presentation(medicine, id) { return medicine.presentations.find(item => item.id === id) || null; }
   function populations(item) { return [...new Set(item.regimens.map(row => row.population))]; }
+  function presentationsForPopulation(medicine, population, { ageMonths, weightKg } = {}) {
+    return medicine.presentations.filter(item => item.regimens.some(row => {
+      if (row.population !== population) return false;
+      if (population !== 'pediatric') return true;
+      return ns.pediatric.eligible(item, row, { ageMonths, weightKg });
+    }));
+  }
   function regimen(item, population, id) { return item.regimens.find(row => row.population === population && (!id || row.id === id)) || null; }
   function normalize(value) { return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
   function search(items, query) {
@@ -14,5 +21,5 @@
       return { item, rank };
     }).filter(row => row.rank < 99).sort((a, b) => a.rank - b.rank).map(row => row.item);
   }
-  ns.medication = { presentation, populations, regimen, search };
+  ns.medication = { presentation, populations, presentationsForPopulation, regimen, search };
 })();

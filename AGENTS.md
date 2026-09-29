@@ -75,6 +75,24 @@ Alterar um medicamento não deve exigir carregar ou modificar todo o catálogo.
 
 Apresentações diferentes devem permanecer separadas.
 
+Pediatria não significa apresentação líquida. Selecionar sempre na ordem
+`medicamento → apresentação → regime por população`, usando dados e fontes
+confirmados. Não excluir comprimidos, cápsulas, sachês, dispersíveis,
+injetáveis ou outras formas apenas por estarem em contexto pediátrico;
+considerar a elegibilidade real de idade e peso de cada regime.
+
+Não existe idade ou peso universal que autorize comprimidos. A elegibilidade
+pediátrica é específica do medicamento, da apresentação e do regime; se não
+houver regime pediátrico confirmado, não inferir autorização. Sólidos válidos
+devem permanecer disponíveis. Nunca presumir que um comprimido pode ser
+partido: fracionamento e frações permitidas exigem confirmação por apresentação.
+
+O motor deve usar metadados da apresentação para dose, quantidade e
+dispensação. Adicionar medicamentos exige principalmente dados, fontes e
+testes, sem condicionais por nome de medicamento no motor central. Quando
+quantidade não puder ser calculada, gerar opções apenas de embalagens reais
+cadastradas e exigir escolha explícita antes de inserir no receituário.
+
 Nunca presumir equivalência entre:
 - concentrações;
 - sais;
@@ -96,6 +114,10 @@ Exemplos:
 - não mostrar opções inválidas apenas para depois bloqueá-las.
 
 A interface deve priorizar informação clínica útil.
+
+Novas funcionalidades devem manter o layout e a simplicidade visual do
+GuildBook, com divulgação progressiva. Revisar toda alteração visual ou
+funcional relevante no preview local em desktop e mobile antes do merge.
 
 Evitar mensagens internas de desenvolvimento na interface médica.
 
