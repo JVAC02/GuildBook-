@@ -1,15 +1,22 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildClinicalIndex } from './clinical-index.mjs';
 
 export async function buildStandalone(root) {
+  await buildClinicalIndex(root);
   const web = resolve(root, 'web');
   const read = path => readFile(resolve(web, path), 'utf8');
   let html = await read('index.html');
   const css = await read('styles.css');
   html = html.replace('<link rel="stylesheet" href="styles.css">', `<style>\n${css}\n</style>`);
   const catalog = JSON.parse(await read('data/medicines/index.json'));
-  const inlineData = { 'data/medicines/index.json': catalog };
+  const inlineData = {
+    'data/medicines/index.json': catalog,
+    'data/clinical/conditions.json': JSON.parse(await read('data/clinical/conditions.json')),
+    'data/clinical/index.json': JSON.parse(await read('data/clinical/index.json')),
+    'data/calculators/index.json': JSON.parse(await read('data/calculators/index.json')),
+  };
   for (const item of catalog) {
     if (!/^[a-z0-9-]+\.json$/.test(item.file)) throw new Error(`Arquivo de medicamento inválido: ${item.file}`);
     const path = `data/medicines/${item.file}`;

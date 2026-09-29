@@ -15,3 +15,11 @@ Cada apresentação possui seus próprios `regimens`, `sourceIds` e, quando conf
 `quantityPolicy` aceita `calculate`, `manual` ou `none`. Se ausente, o motor usa `regimen.quantityKind`: `facility` não gera dispensação, `variable` pede escolha e os demais calculam somente com dose, intervalo e duração válidos. Quando há tamanhos cadastrados, o cálculo sugere a menor combinação suficiente. Sem cálculo, nenhuma embalagem é selecionada: o prescritor escolhe uma opção gerada de `packageSizes` ou informa quantidade manual. `canFractionate` libera quantidade fracionária de sólidos somente quando confirmada.
 
 Para ampliar o catálogo, acrescentar dados e fontes da apresentação, registrar o medicamento em `index.json` e criar testes de elegibilidade, dose e quantidade pertinentes. Não alterar dados clínicos para fazer testes passarem.
+
+## Associações clínicas
+
+`clinicalRelations` é a fonte estruturada de verdade para novas associações. Cada relação declara `conditionId` do registro em `../clinical/conditions.json`, `type` (`indication`, `symptomatic`, `prophylaxis` ou `adjunct`) e `sourceIds` existentes em `sources` do próprio medicamento. A relação descreve descoberta de recursos; não seleciona apresentação, população, dose ou receituário.
+
+O antigo `indications` não alimenta a busca clínica. Os valores atuais com correspondência confirmada foram migrados para `clinicalRelations`. Em medicamentos futuros ainda em transição, texto legado sem correspondência canônica permanece no arquivo e é informado pelo gerador como pendente de revisão; ele não recebe um `conditionId` inferido. Texto legado que coincide com nome ou alias canônico causa erro até ser migrado explicitamente, impedindo duas fontes para a mesma relação.
+
+Execute `npm run clinical:index` depois de alterar condições, relações ou calculadoras. O arquivo `../clinical/index.json` é derivado, contém apenas IDs relacionados e é verificado por `npm test`. O preview e o exportador standalone também o regeneram uma vez antes de servir ou exportar a aplicação. A busca usa esse índice e o catálogo leve; o JSON completo do medicamento só é carregado ao abrir seu fluxo normal.

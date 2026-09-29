@@ -2,8 +2,10 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildClinicalIndex } from './clinical-index.mjs';
 
 const web = resolve(fileURLToPath(new URL('../web/', import.meta.url)));
+await buildClinicalIndex(resolve(fileURLToPath(new URL('../', import.meta.url))));
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml' };
 const port = Number(process.env.PORT || 4173);
 createServer(async (request, response) => {

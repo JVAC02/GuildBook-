@@ -5,7 +5,12 @@
   "category": "Analgésico e anti-inflamatório",
   "class": "Anti-inflamatório não esteroidal (AINE)",
   "brands": ["Profenid"],
-  "indications": ["Dor musculoesquelética", "Inflamação", "Dor pós-operatória"],
+  "clinicalRelations": [
+    { "conditionId": "dor", "type": "symptomatic", "sourceIds": ["eurofarma-drops"] },
+    { "conditionId": "dor-musculoesqueletica", "type": "symptomatic", "sourceIds": ["eurofarma-drops"] },
+    { "conditionId": "inflamacao", "type": "indication", "sourceIds": ["eurofarma-drops"] },
+    { "conditionId": "dor-pos-operatoria", "type": "symptomatic", "sourceIds": ["eurofarma-drops"] }
+  ],
   "presentations": [
     {
       "id":"keto-50","label":"Cetoprofeno 50 mg — cápsula","form":"cápsula","concentration":"50 mg","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[24],"sourceIds":["profenid"],
