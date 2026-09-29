@@ -35,6 +35,19 @@ test('cetoprofeno pediatric drops use confirmed drop relation and age rule', () 
   assert.equal(pediatric.resolve(regimen, { weightKg: 10, ageMonths: 11 }), null);
 });
 
+test('pediatric presentations are selected by confirmed regimen, including solids', () => {
+  const solid = { id: 'solid', form: 'comprimido dispersível', regimens: [{ population: 'pediatric', dose: { kind: 'fixed', units: 1, unit: 'comprimido', mg: 100, minAgeMonths: 72 } }] };
+  const example = { presentations: [{ id: 'adult-only', form: 'solução', regimens: [{ population: 'adult' }] }, solid] };
+  assert.deepEqual(medication.presentationsForPopulation(example, 'pediatric').map(item => item.id), ['solid']);
+  assert.deepEqual(medication.presentationsForPopulation(example, 'pediatric', { ageMonths: 60 }).map(item => item.id), []);
+  assert.deepEqual(medication.presentationsForPopulation(example, 'pediatric', { ageMonths: 96, weightKg: 18 }).map(item => item.id), ['solid']);
+  assert.deepEqual(pediatric.resolve(solid.regimens[0], { ageMonths: 96 }), solid.regimens[0].dose);
+  assert.deepEqual(pediatric.resolve({ population: 'pediatric', dose: { kind: 'fixed', units: 1, unit: 'comprimido', mg: 100 } }), { kind: 'fixed', units: 1, unit: 'comprimido', mg: 100 });
+  assert.equal(pediatric.resolve(solid.regimens[0], { ageMonths: 60 }), null);
+  assert.equal(medication.presentationsForPopulation(dip, 'pediatric', { ageMonths: 6, weightKg: 6 }).some(item => item.id === 'dip-iv'), false);
+  assert.equal(medication.presentationsForPopulation(dip, 'pediatric', { ageMonths: 6, weightKg: 6 }).some(item => item.id === 'dip-im'), true);
+});
+
 test('duration calculates exact and closed pack quantities', () => {
   assert.deepEqual(quantity.calculate({ units: 1, unit: 'cápsula', intervalHours: 8, days: 10, packSize: 24 }), { required: 30, closedPack: 48, packs: 2, unit: 'cápsula' });
   assert.equal(quantity.calculate({ units: 1, unit: 'comprimido', intervalHours: 6, days: 0 }), null);

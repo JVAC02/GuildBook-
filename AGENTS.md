@@ -75,6 +75,12 @@ Alterar um medicamento não deve exigir carregar ou modificar todo o catálogo.
 
 Apresentações diferentes devem permanecer separadas.
 
+Pediatria não significa apresentação líquida. Selecionar sempre na ordem
+`medicamento → apresentação → regime por população`, usando dados e fontes
+confirmados. Não excluir comprimidos, cápsulas, sachês, dispersíveis,
+injetáveis ou outras formas apenas por estarem em contexto pediátrico;
+considerar a elegibilidade real de idade e peso de cada regime.
+
 Nunca presumir equivalência entre:
 - concentrações;
 - sais;

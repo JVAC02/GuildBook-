@@ -2,9 +2,11 @@
   const ns = globalThis.GuildBookCore ||= {};
   const rounded = value => Math.round((value + Number.EPSILON) * 100) / 100;
   function resolve(regimen, { weightKg, ageMonths, chosenUnits } = {}) {
-    if (regimen.population !== 'pediatric' || !Number.isFinite(ageMonths)) return null;
+    if (regimen.population !== 'pediatric') return null;
     const dose = regimen.dose;
+    if ((dose.minAgeMonths != null || dose.maxAgeMonths != null || dose.kind === 'ageWeightDrops') && !Number.isFinite(ageMonths)) return null;
     if (ageMonths < (dose.minAgeMonths || 0) || (dose.maxAgeMonths && ageMonths >= dose.maxAgeMonths)) return null;
+    if (dose.kind === 'fixed') return dose;
     if (dose.kind === 'weightBands') {
       if (!Number.isFinite(weightKg) || weightKg <= 0) return null;
       const band = dose.bands.find(row => weightKg >= row.minKg && weightKg <= row.maxKg);

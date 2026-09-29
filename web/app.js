@@ -5,15 +5,26 @@
   const fmt = value => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value);
   const unitLabel = (unit, amount) => amount === 1 ? unit : ({ 'cápsula': 'cápsulas', 'comprimido': 'comprimidos', 'gota': 'gotas', 'gotas': 'gotas' }[unit] || unit);
   const builderKey = 'guildbook-v7-prescription-builder';
+  const patientContextKey = 'guildbook-v7-patient-context';
   const savedItems = core.storage.get(builderKey, []);
-  const state = { view: 'home', medicineId: null, presentationId: null, population: 'adult', query: '', ageMonths: '', weightKg: '', chosenUnits: '', days: '', mode: 'exact', packSize: '', manualQuantity: '', items: Array.isArray(savedItems) ? savedItems.filter(item => item && typeof item.key === 'string' && typeof item.instruction === 'string') : [], patientName: '', printDetails: {}, editIndex: null };
+  const savedContext = core.storage.get(patientContextKey, {});
+  const state = { view: 'home', medicineId: null, presentationId: null, population: savedContext?.population === 'pediatric' ? 'pediatric' : 'adult', query: '', ageMonths: String(savedContext?.ageMonths ?? ''), weightKg: String(savedContext?.weightKg ?? ''), chosenUnits: '', days: '', mode: 'exact', packSize: '', manualQuantity: '', items: Array.isArray(savedItems) ? savedItems.filter(item => item && typeof item.key === 'string' && typeof item.instruction === 'string') : [], patientName: '', printDetails: {}, editIndex: null };
   let catalog = [];
   const cache = new Map();
   const inline = globalThis.__GB_DATA__;
   const data = async path => inline ? inline[path] : (await fetch(path)).json();
 
   function resetChoice() {
-    Object.assign(state, { ageMonths: '', weightKg: '', chosenUnits: '', days: '', mode: 'exact', packSize: '', manualQuantity: '' });
+    Object.assign(state, { chosenUnits: '', days: '', mode: 'exact', packSize: '', manualQuantity: '' });
+  }
+  function savePatientContext() { core.storage.set(patientContextKey, { population: state.population, ageMonths: state.ageMonths, weightKg: state.weightKg }); }
+  function patientValues() { return { ageMonths: state.ageMonths === '' ? undefined : Number(state.ageMonths), weightKg: state.weightKg === '' ? undefined : Number(state.weightKg) }; }
+  function patientContextIndicator() {
+    if (state.population !== 'pediatric') return '<span class="patient-context-indicator">Adulto</span>';
+    const age = state.ageMonths !== '' && Number.isInteger(Number(state.ageMonths)) && Number(state.ageMonths) >= 0 ? Number(state.ageMonths) : null;
+    const ageText = age === null ? '' : age >= 12 && age % 12 === 0 ? `${age / 12} ${age === 12 ? 'ano' : 'anos'}` : `${age} ${age === 1 ? 'mês' : 'meses'}`;
+    const weightText = state.weightKg !== '' && Number(state.weightKg) > 0 ? `${fmt(Number(state.weightKg))} kg` : '';
+    return `<span class="patient-context-indicator">Pediatria${ageText ? ` · ${ageText}` : ''}${weightText ? ` · ${weightText}` : ''}</span>`;
   }
   function contextLabel(context) { return ({ ambulatory: 'Receituário ambulatorial', urgent: 'Uso assistencial', hospital: 'Uso hospitalar' })[context]; }
   function navButton(view, label, icon) { return `<button type="button" data-view="${view}" class="${state.view === view ? 'active' : ''}"><span>${icon}</span>${label}${view === 'builder' ? `<span class="builder-count" ${state.items.length ? '' : 'hidden'}>${state.items.length}</span>` : ''}</button>`; }
@@ -34,7 +45,8 @@
   function renderListing() {
     const home = state.view === 'home';
     const hero = home ? `<section class="hero"><div class="hero-content"><div class="eyebrow">CONSULTA RÁPIDA · APRESENTAÇÃO POR APRESENTAÇÃO</div><h1>Informação clínica<br>na medida certa.</h1><p>Encontre o medicamento, escolha a apresentação e veja apenas o esquema correspondente.</p><div class="search-wrap"><input id="search" class="search-input" type="search" placeholder="Buscar medicamento ou nome comercial..." autocomplete="off" value="${ui.escape(state.query)}" aria-label="Buscar medicamento"></div><div class="home-actions"><button data-view="medications">Medicamentos</button><button data-view="favorites">Favoritos</button></div></div></section>` : `<div class="breadcrumbs"><button data-view="home">Início</button><span>›</span><span>${state.view === 'favorites' ? 'Favoritos' : 'Medicamentos'}</span></div><h1 class="page-title">${state.view === 'favorites' ? 'Favoritos' : 'Medicamentos'}</h1><div class="search-wrap" style="margin-top:18px"><input id="search" class="search-input" type="search" placeholder="Buscar medicamento..." value="${ui.escape(state.query)}" aria-label="Buscar medicamento"></div>`;
-    shell(`${hero}<div class="section-top"><div><div class="section-kicker">${state.view === 'favorites' ? 'SUA LISTA' : 'BIBLIOTECA CLÍNICA'}</div><h2>${home ? 'Medicamentos disponíveis' : state.view === 'favorites' ? 'Seus favoritos' : 'Escolha um medicamento'}</h2></div><p>2 medicamentos-modelo</p></div><div class="med-grid" id="med-grid">${cards()}</div>`);
+    const patientContext = `<div class="library-context"><div class="segment library-population" role="group" aria-label="Contexto da biblioteca"><button type="button" data-library-population="adult" class="${state.population === 'adult' ? 'active' : ''}" aria-pressed="${state.population === 'adult'}">Adulto</button><button type="button" data-library-population="pediatric" class="${state.population === 'pediatric' ? 'active' : ''}" aria-pressed="${state.population === 'pediatric'}">Pediatria</button></div>${state.population === 'pediatric' ? `<div class="patient-context-panel" id="patient-context"><strong>Contexto do paciente (pediatria)</strong><div class="patient-context-fields"><label for="patient-age-months"><span>Idade (meses)</span><input id="patient-age-months" type="number" min="0" step="1" inputmode="numeric" value="${ui.escape(state.ageMonths)}" placeholder="Ex.: 48"></label><label for="patient-weight-kg"><span>Peso (kg)</span><input id="patient-weight-kg" type="number" min="0.1" step="0.1" inputmode="decimal" value="${ui.escape(state.weightKg)}" placeholder="Ex.: 18"></label></div></div>` : ''}</div>`;
+    shell(`${hero}<div class="section-top"><div><div class="section-kicker">${state.view === 'favorites' ? 'SUA LISTA' : 'BIBLIOTECA CLÍNICA'}</div><h2>${home ? 'Medicamentos disponíveis' : state.view === 'favorites' ? 'Seus favoritos' : 'Escolha um medicamento'}</h2></div>${patientContext}<p>2 medicamentos-modelo</p></div><div class="med-grid" id="med-grid">${cards()}</div>`);
   }
   async function loadMedicine(id) {
     if (!cache.has(id)) {
@@ -52,7 +64,13 @@
     if (!r) return null;
     if (r.dose.kind === 'fixed') return r.dose;
     if (r.dose.kind === 'topical') return { units: 0, unit: 'g', mg: null };
-    return core.pediatric.resolve(r, { weightKg: Number(state.weightKg), ageMonths: Number(state.ageMonths), chosenUnits: state.chosenUnits === '' ? undefined : Number(state.chosenUnits) });
+    return core.pediatric.resolve(r, { ...patientValues(), chosenUnits: state.chosenUnits === '' ? undefined : Number(state.chosenUnits) });
+  }
+  function missingDoseText() {
+    const row = regimen().dose;
+    if (state.ageMonths === '' && (row.minAgeMonths != null || row.maxAgeMonths != null || row.kind === 'ageWeightDrops')) return 'Informe a idade no contexto do paciente.';
+    if (state.weightKg === '' && (row.kind === 'weightBands' || (row.kind === 'ageWeightDrops' && Number(state.ageMonths) < row.fixedFromMonths))) return 'Informe o peso no contexto do paciente.';
+    return 'Confira idade e peso no contexto do paciente para esta apresentação.';
   }
   function quantity() {
     const p = selected(), r = regimen(), d = dose();
@@ -67,11 +85,8 @@
     if (r.population !== 'pediatric') return '';
     const d = dose();
     const row = r.dose;
-    const age = `<label class="field" for="age"><span class="field-label">Idade em meses</span><input id="age" type="number" min="0" max="179" step="1" inputmode="numeric" value="${ui.escape(state.ageMonths)}"><small>A idade define se esta apresentação é aplicável.</small></label>`;
-    const needsWeight = row.kind !== 'ageWeightDrops' || Number(state.ageMonths) < row.fixedFromMonths;
-    const weight = needsWeight ? `<label class="field" for="weight"><span class="field-label">Peso em kg</span><input id="weight" type="number" min="0" step="0.1" inputmode="decimal" value="${ui.escape(state.weightKg)}"><small>Usado somente quando altera a dose desta apresentação.</small></label>` : '';
     const choice = row.kind === 'weightBands' && d?.range ? `<label class="field" for="dose-units"><span class="field-label">Dose por tomada · ${ui.escape(row.unit)}</span><input id="dose-units" type="number" min="${d.range[0]}" max="${d.range[1]}" step="${row.unit === 'gotas' ? '1' : '0.05'}" value="${ui.escape(state.chosenUnits || d.units)}"><small>Faixa da bula: ${fmt(d.range[0])} a ${fmt(d.range[1])} ${ui.escape(row.unit)}.</small></label>` : '';
-    return `<div class="controls-grid">${age}${weight}${choice}</div>`;
+    return choice ? `<div class="controls-grid">${choice}</div>` : '';
   }
   function controls() {
     const p = selected(), r = regimen();
@@ -87,14 +102,14 @@
     const m = medicine(), p = selected();
     if (!m || !p) return;
     const fav = core.favorites.has(m.id);
-    shell(`<div class="breadcrumbs"><button data-view="home">Início</button><span>›</span><button data-view="medications">Medicamentos</button><span>›</span><span>${ui.escape(m.name)}</span></div><div class="medicine-heading"><div><div class="section-kicker">${ui.escape(m.category.toUpperCase())}</div><h1>${ui.escape(m.name)}</h1><p>${ui.escape(m.class)} · Escolha a forma e a concentração antes de prescrever</p></div><button class="heading-fav" data-favorite="${m.id}" aria-pressed="${fav}"><span>${fav ? '★' : '☆'}</span> Favorito</button></div><div class="medicine-layout"><div class="left-stack"><div class="card">${ui.medicationSelector(m, p, state.population)}</div><aside class="card meta-card"><h3>Apresentação selecionada</h3><div class="meta-line"><span>Forma</span><strong>${ui.escape(p.form)}</strong></div><div class="meta-line"><span>Concentração</span><strong>${ui.escape(p.concentration)}</strong></div><div class="meta-line"><span>Liberação</span><strong>${ui.escape(p.releaseType)}</strong></div><div class="meta-line"><span>Contexto</span><strong>${ui.escape(contextLabel(p.context))}</strong></div></aside></div><div class="right-stack"><section class="card clinical-card" id="clinical-output"></section>${controls()}<details class="accordion"><summary>Contraindicações, ajustes e cuidados</summary><div class="accordion-content"><ul>${m.safety.map(item => `<li>${ui.escape(item)}</li>`).join('')}</ul></div></details><details class="accordion"><summary>Fontes e revisão clínica</summary><div class="accordion-content"><p>Fonte vinculada à apresentação selecionada. Verifique a bula vigente antes do uso.</p><ul>${selectedSources()}</ul></div></details></div></div>`);
+    shell(`<div class="breadcrumbs"><button data-view="home">Início</button><span>›</span><button data-view="medications">Medicamentos</button><span>›</span><span>${ui.escape(m.name)}</span></div><div class="medicine-heading"><div><div class="section-kicker">${ui.escape(m.category.toUpperCase())}</div><h1>${ui.escape(m.name)}</h1><p>${ui.escape(m.class)} · Escolha a forma e a concentração antes de prescrever</p>${patientContextIndicator()}</div><button class="heading-fav" data-favorite="${m.id}" aria-pressed="${fav}"><span>${fav ? '★' : '☆'}</span> Favorito</button></div><div class="medicine-layout"><div class="left-stack"><div class="card">${ui.medicationSelector(m, p, state.population, patientValues())}</div><aside class="card meta-card"><h3>Apresentação selecionada</h3><div class="meta-line"><span>Forma</span><strong>${ui.escape(p.form)}</strong></div><div class="meta-line"><span>Concentração</span><strong>${ui.escape(p.concentration)}</strong></div><div class="meta-line"><span>Liberação</span><strong>${ui.escape(p.releaseType)}</strong></div><div class="meta-line"><span>Contexto</span><strong>${ui.escape(contextLabel(p.context))}</strong></div></aside></div><div class="right-stack"><section class="card clinical-card" id="clinical-output"></section>${controls()}<details class="accordion"><summary>Contraindicações, ajustes e cuidados</summary><div class="accordion-content"><ul>${m.safety.map(item => `<li>${ui.escape(item)}</li>`).join('')}</ul></div></details><details class="accordion"><summary>Fontes e revisão clínica</summary><div class="accordion-content"><p>Fonte vinculada à apresentação selecionada. Verifique a bula vigente antes do uso.</p><ul>${selectedSources()}</ul></div></details></div></div>`);
     renderDynamic();
   }
   function renderDynamic() {
     if (state.view !== 'medicine') return;
     const p = selected(), r = regimen(), d = dose();
     const clinical = document.querySelector('#clinical-output');
-    const doseText = d ? `${fmt(d.mg)} mg${d.unit === 'gotas' ? ` · ${fmt(d.units)} gotas` : d.unit === 'mL' ? ` · ${fmt(d.units)} mL` : ''}` : 'Confira idade e peso da faixa da bula';
+    const doseText = d ? `${fmt(d.mg)} mg${d.unit === 'gotas' ? ` · ${fmt(d.units)} gotas` : d.unit === 'mL' ? ` · ${fmt(d.units)} mL` : ''}` : missingDoseText();
     const intervalText = r.intervalHours ? (r.quantityKind === 'maximum' ? `Até ${24 / r.intervalHours} vezes/dia` : r.intervalHours === 24 ? '1 vez ao dia' : `A cada ${r.intervalHours} h`) : r.intervalText;
     clinical.innerHTML = `<div class="section-kicker">${ui.escape(contextLabel(p.context).toUpperCase())}</div><h2>Esquema da apresentação</h2><div class="clinical-grid"><div class="clinical-cell"><span>Via</span><strong>${ui.escape(p.route)}</strong></div><div class="clinical-cell"><span>Dose</span><strong>${ui.escape(doseText)}</strong></div><div class="clinical-cell"><span>Intervalo</span><strong>${ui.escape(intervalText)}</strong></div><div class="clinical-cell"><span>População</span><strong>${state.population === 'adult' ? 'Adulto' : 'Pediatria'}</strong></div></div><div class="clinical-detail"><b>Dose máxima</b><span>${ui.escape(r.maxDoseText)}</span></div>${d && r.dose.kind === 'ageWeightDrops' && Number(state.ageMonths) < r.dose.fixedFromMonths ? `<div class="clinical-detail"><b>Dose de referência</b><span>${fmt(r.dose.unitsPerKg)} gota/kg/dose · ${fmt(r.dose.unitsPerKg * r.dose.mgPerUnit)} mg/kg/dose</span></div>` : ''}${d?.volumeMl && d.unit === 'gotas' ? `<div class="clinical-detail"><b>Volume / concentração</b><span>${fmt(d.volumeMl)} mL por dose · ${ui.escape(p.concentration)}</span></div>` : ''}${d?.range ? `<div class="clinical-detail"><b>Faixa por peso</b><span>${fmt(d.range[0])}–${fmt(d.range[1])} ${ui.escape(d.unit)} por dose</span></div>` : ''}${p.preparation ? `<div class="note"><b>Preparo / administração</b><br>${ui.escape(p.preparation)}</div>` : ''}${p.context !== 'ambulatory' ? '<div class="note">Administração em serviço de saúde; a duração e a quantidade dependem da avaliação assistencial.</div>' : ''}`;
     const out = document.querySelector('#quantity-output');
@@ -112,7 +127,7 @@
     const pendingInput = `<label class="field manual-control" for="manual-quantity"><span class="field-label">Quantidade a dispensar (opcional) · ${ui.escape(p.packageUnit || (d?.unit === 'gotas' ? 'mL' : d?.unit || ''))}</span><input id="manual-quantity" type="number" min="0.01" step="0.01" value="${ui.escape(state.manualQuantity)}"><small>Informe apenas se definida; não presumimos embalagem.</small></label>`;
     if (r.quantityKind === 'variable') return `<div class="quantity-box"><div class="quantity-top"><span>Quantidade</span><strong>Conforme área tratada</strong></div><small>Não há consumo fixo em gramas por aplicação na bula. Bisnaga confirmada: 30 g.</small></div>${pendingInput}`;
     const q = quantity();
-    if (!d) return '<p class="helper">Informe idade e peso para calcular a dose.</p>';
+    if (!d) return `<p class="helper">${missingDoseText()}</p>`;
     if (!q) return `<p class="helper">Sem duração, a quantidade automática fica pendente.</p>${pendingInput}`;
     const label = r.quantityKind === 'maximum' ? 'Máximo estimado para o período' : 'Quantidade necessária';
     const chosen = state.mode === 'pack' ? q.closedPack : state.mode === 'manual' ? Number(state.manualQuantity) : q.required;
@@ -145,11 +160,12 @@
   async function openMedicine(id, presentationId, population) {
     const m = await loadMedicine(id);
     if (!m) return;
+    if (population === 'adult' || population === 'pediatric') { state.population = population; savePatientContext(); }
+    const available = core.medication.presentationsForPopulation(m, state.population, patientValues());
+    if (!available.length) { state.view = 'medications'; location.hash = '#medications'; renderListing(); toast('Nenhuma apresentação confirmada para este contexto'); return; }
     state.view = 'medicine';
     state.medicineId = id;
-    state.presentationId = presentationId && core.medication.presentation(m, presentationId) ? presentationId : m.presentations[0].id;
-    const p = core.medication.presentation(m, state.presentationId);
-    state.population = core.medication.populations(p).includes(population) ? population : core.medication.populations(p)[0];
+    state.presentationId = available.some(item => item.id === presentationId) ? presentationId : available[0].id;
     resetChoice();
     location.hash = `#medicine/${id}/${state.presentationId}/${state.population}`;
     renderMedicine();
@@ -169,8 +185,8 @@
     if (open) return openMedicine(open.dataset.open);
     const favorite = event.target.closest('[data-favorite]');
     if (favorite) { core.favorites.toggle(favorite.dataset.favorite); return state.view === 'medicine' ? renderMedicine() : renderListing(); }
-    const pop = event.target.closest('[data-population]');
-    if (pop) { state.population = pop.dataset.population; resetChoice(); location.hash = `#medicine/${state.medicineId}/${state.presentationId}/${state.population}`; return renderMedicine(); }
+    const pop = event.target.closest('[data-library-population]');
+    if (pop) { state.population = pop.dataset.libraryPopulation; savePatientContext(); return renderListing(); }
     if (event.target.id === 'restore-auto') { state.mode = 'exact'; state.manualQuantity = ''; return renderDynamic(); }
     if (event.target.id === 'add-builder') {
       const item = core.prescription.createItem({ medicine: medicine(), presentation: selected(), regimen: regimen(), dose: dose(), days: state.days || null, quantity: quantity(), mode: state.mode, manualQuantity: state.manualQuantity, packSize: state.packSize });
@@ -206,8 +222,8 @@
   root.addEventListener('input', event => {
     if (event.target.id === 'search') { state.query = event.target.value; document.querySelector('#med-grid').innerHTML = cards(); }
     if (event.target.id === 'duration') { state.days = event.target.value; renderDynamic(); }
-    if (event.target.id === 'age') state.ageMonths = event.target.value;
-    if (event.target.id === 'weight') state.weightKg = event.target.value;
+    if (event.target.id === 'patient-age-months') { state.ageMonths = event.target.value; savePatientContext(); }
+    if (event.target.id === 'patient-weight-kg') { state.weightKg = event.target.value; savePatientContext(); }
     if (event.target.id === 'dose-units') { state.chosenUnits = event.target.value; renderDynamic(); }
     if (event.target.id === 'manual-quantity') { state.manualQuantity = event.target.value; state.mode = 'manual'; }
     if (event.target.id === 'patient-name') { state.patientName = event.target.value; renderPreview(); }
@@ -215,7 +231,6 @@
   });
   root.addEventListener('change', event => {
     if (event.target.id === 'presentation') return openMedicine(state.medicineId, event.target.value);
-    if (event.target.id === 'age' || event.target.id === 'weight') { state.chosenUnits = ''; return renderMedicine(); }
     if (event.target.id === 'pack-size') { state.packSize = event.target.value; return renderDynamic(); }
     if (event.target.name === 'dispense') { state.mode = event.target.value; return renderDynamic(); }
     if (event.target.id === 'manual-quantity') return renderDynamic();
@@ -227,3 +242,5 @@
   });
   (async () => { catalog = await data('data/medicines/index.json'); route(); })().catch(error => { console.error(error); root.innerHTML = '<main class="page"><h1>Não foi possível carregar o catálogo</h1><p>Abra o arquivo standalone ou use a prévia local.</p></main>'; });
 })();
+
+
