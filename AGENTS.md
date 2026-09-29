@@ -5,7 +5,7 @@
 Este repositório é o GuildBook atual.
 
 Fonte oficial única:
-- GitHub: JVAC02/GuildBook
+- GitHub: JVAC02/GuildBook-
 - Branch principal: main
 
 O repositório JVAC02/GuildBook-Legacy é apenas histórico.
