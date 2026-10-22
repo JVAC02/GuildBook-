@@ -11,9 +11,11 @@
   const fmt = value => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value);
   const singular = unit => ({ comprimidos: 'comprimido', cápsulas: 'cápsula', gotas: 'gota' })[unit] || unit;
   const plural = (unit, count) => count === 1 ? unit : ({ comprimido: 'comprimidos', cápsula: 'cápsulas', gota: 'gotas', frasco: 'frascos', caixa: 'caixas', bisnaga: 'bisnagas' })[unit] || unit;
-  const measure = (amount, unit) => `${fmt(amount)} ${plural(unit, amount)}`;
+  const abbreviation = unit => ({ comprimido: 'CP', cápsula: 'CAP', ampola: 'AMP', 'frasco-ampola': 'FA', frasco: 'FR', caixa: 'CX', bisnaga: 'TB', mL: 'mL', g: 'g', gota: 'GOTAS' })[singular(unit)] || plural(unit, 1);
+  const measure = (amount, unit) => `${fmt(amount)} ${abbreviation(unit)}`;
   function packageText(packages, container, sizeUnit) {
-    return packages.map(({ size, count }) => container ? `${count} ${plural(container, count)} de ${measure(size, sizeUnit)}` : measure(rounded(size * count), sizeUnit)).join(' + ');
+    const byContainer = container && !['comprimido', 'comprimidos', 'cápsula', 'cápsulas', 'mL'].includes(sizeUnit);
+    return measure(rounded(packages.reduce((sum, item) => sum + item.count * (byContainer ? 1 : item.size), 0)), byContainer ? container : sizeUnit);
   }
   function suggestPack(required, sizes) {
     if (!Number.isFinite(required) || required <= 0 || !sizes.length) return null;
@@ -60,5 +62,5 @@
     if (kind === 'manual' && Number.isFinite(amount) && amount > 0 && (plan.canFractionate || !['comprimido', 'cápsula'].includes(plan.unit) || Number.isInteger(amount))) return { quantity: amount, unit: plan.unit, text: measure(amount, plan.unit), method: 'manual', packages: [] };
     return null;
   }
-  ns.quantity = { calculate, suggestPack, plan, select, measure, packageText };
+  ns.quantity = { calculate, suggestPack, plan, select, measure, packageText, abbreviation };
 })();

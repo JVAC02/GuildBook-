@@ -13,7 +13,7 @@ test('liquid volume uses confirmed dose relation and smallest sufficient package
   assert.equal(plan.required, 14);
   assert.equal(plan.unit, 'mL');
   assert.deepEqual(plan.suggestion, [{ size: 20, count: 1 }]);
-  assert.equal(quantity.select(plan, { kind: 'suggested' }).text, '1 frasco de 20 mL');
+  assert.equal(quantity.select(plan, { kind: 'suggested' }).text, '20 mL');
   assert.ok(quantity.select(plan, { kind: 'suggested' }).quantity >= plan.required);
 });
 
@@ -21,7 +21,7 @@ test('solid treatment and multiple package combinations are data driven', () => 
   const plan = quantity.plan({ presentation: solid, regimen: scheduled(8), dose: { units: 1, unit: 'comprimido', mg: 500 }, days: 7 });
   assert.equal(plan.required, 21);
   assert.deepEqual(plan.suggestion, [{ size: 30, count: 1 }]);
-  assert.equal(quantity.select(plan, { kind: 'suggested' }).text, '1 caixa de 30 comprimidos');
+  assert.equal(quantity.select(plan, { kind: 'suggested' }).text, '30 CP');
   const long = quantity.plan({ presentation: solid, regimen: scheduled(24), dose: { units: 5, unit: 'comprimido' }, days: 10 });
   assert.equal(long.required, 50);
   assert.deepEqual(long.suggestion, [{ size: 20, count: 1 }, { size: 30, count: 1 }]);
@@ -34,15 +34,15 @@ test('without duration no package is selected until explicitly confirmed', () =>
   assert.equal(plan.suggestion, null);
   assert.deepEqual(plan.options.map(option => option.size), [10, 20]);
   assert.equal(quantity.select(plan, { kind: 'suggested' }), null);
-  assert.equal(quantity.select(plan, { kind: 'package', size: 20 }).text, '1 frasco de 20 mL');
+  assert.equal(quantity.select(plan, { kind: 'package', size: 20 }).text, '20 mL');
   assert.equal(quantity.select(plan, { kind: 'manual', amount: 17 }).text, '17 mL');
 });
 
 test('plural package metadata retains singular quantity units for manual editing', () => {
   const plan = quantity.plan({ presentation: { ...solid, packageSizeUnit: 'comprimidos' }, regimen: scheduled(8), dose: { units: 1, unit: 'comprimido' }, days: null });
   assert.equal(plan.unit, 'comprimido');
-  assert.deepEqual(plan.options.map(option => option.label), ['1 caixa de 20 comprimidos', '1 caixa de 30 comprimidos']);
-  assert.equal(quantity.select(plan, { kind: 'manual', amount: 1 }).text, '1 comprimido');
+  assert.deepEqual(plan.options.map(option => option.label), ['20 CP', '30 CP']);
+  assert.equal(quantity.select(plan, { kind: 'manual', amount: 1 }).text, '1 CP');
 });
 
 test('as-needed regimen retains maximum-estimate semantics', () => {
@@ -55,8 +55,8 @@ test('variable quantity offers only confirmed packages or manual amount', () => 
   const gel = { packageUnit: 'bisnaga', packageSizeUnit: 'g', packageSizes: [30], quantityPolicy: 'manual' };
   const plan = quantity.plan({ presentation: gel, regimen: { quantityKind: 'variable' }, dose: { units: 0, unit: 'g' }, days: 7 });
   assert.equal(plan.required, null);
-  assert.deepEqual(plan.options.map(option => option.label), ['1 bisnaga de 30 g']);
-  assert.equal(quantity.select(plan, { kind: 'package', size: 30 }).text, '1 bisnaga de 30 g');
+  assert.deepEqual(plan.options.map(option => option.label), ['1 TB']);
+  assert.equal(quantity.select(plan, { kind: 'package', size: 30 }).text, '1 TB');
   assert.equal(quantity.select(plan, { kind: 'manual', amount: 45 }).text, '45 g');
 });
 
@@ -64,7 +64,7 @@ test('unknown package metadata never creates a package choice', () => {
   const plan = quantity.plan({ presentation: { packageSizes: [], quantityPolicy: 'calculate' }, regimen: scheduled(12), dose: { units: 1, unit: 'comprimido' }, days: 5 });
   assert.deepEqual(plan.options, []);
   assert.equal(plan.required, 10);
-  assert.equal(quantity.select(plan, { kind: 'suggested' }).text, '10 comprimidos');
+  assert.equal(quantity.select(plan, { kind: 'suggested' }).text, '10 CP');
   assert.equal(quantity.select(quantity.plan({ presentation: { packageSizes: [] }, regimen: scheduled(12), dose: { units: 1, unit: 'comprimido' }, days: null }), { kind: 'package', size: 1 }), null);
 });
 
@@ -76,11 +76,11 @@ test('prescription requires a chosen quantity and prints the confirmed package',
   assert.equal(prescription.createItem({ medicine, presentation, regimen, dose: regimen.dose, days: null }), null);
   const item = prescription.createItem({ medicine, presentation, regimen, dose: regimen.dose, days: 7, dispensing: quantity.select(plan, { kind: 'suggested' }) });
   assert.equal(item.quantity, 30);
-  assert.match(prescription.format([item]), /MEDICAMENTO NOVO 500 MG -+ 1 CAIXA DE 30 COMPRIMIDOS/);
+  assert.match(prescription.format([item]), /MEDICAMENTO NOVO 500 MG -+ 30 CP/);
   const changed = prescription.updateItem(item, { days: 10, quantity: '' });
   assert.equal(changed.quantity, 30);
-  assert.equal(changed.quantityText, '1 caixa de 30 comprimidos');
+  assert.equal(changed.quantityText, '30 CP');
   assert.equal(prescription.updateItem(item, { days: '', quantity: '' }), null);
   const manual = prescription.updateItem(item, { days: '', quantity: '40' });
-  assert.equal(manual.quantityText, '40 comprimidos');
+  assert.equal(manual.quantityText, '40 CP');
 });

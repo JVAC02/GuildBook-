@@ -27,8 +27,8 @@ test('selected presentation and explicit package work without duration', () => {
   assert.equal(item.durationDays, null);
   assert.equal(item.quantity, 10);
   assert.equal(item.quantityMethod, 'confirmed-package');
-  assert.match(item.instruction, /TOMAR 01 CP DE 6\/6H SE NECESSÁRIO\./);
-  assert.match(prescription.format([item]), /DIPIRONA 1 G -+ 10 COMPRIMIDOS/);
+  assert.match(item.instruction, /TOMAR 1 CP DE 6\/6H SE DOR OU FEBRE\./);
+  assert.match(prescription.format([item]), /DIPIRONA 1 G -+ 10 CP/);
 });
 
 test('calculated quantity is on the medication line and grouped by route', () => {
@@ -38,10 +38,10 @@ test('calculated quantity is on the medication line and grouped by route', () =>
   const topical = create({ ...selection(keto, 'keto-gel'), days: null, quantity: null });
   const text = prescription.format([oral, topical], 'Maria');
   assert.match(text, /PACIENTE: Maria/);
-  assert.match(text, /USO ORAL\n\n1\. CETOPROFENO 100 MG -+ 20 COMPRIMIDOS/);
-  assert.match(text, /TOMAR 01 CP DE 12\/12H POR 5 DIAS\./);
+  assert.match(text, /USO ORAL\n\n1\. CETOPROFENO 100 MG -+ 20 CP/);
+  assert.match(text, /TOMAR 1 CP DE 12\/12H POR 5 DIAS\./);
   assert.match(text, /USO TÓPICO/);
-  assert.match(text, /CETOPROFENO 25 MG\/G -+ 1 BISNAGA DE 30 G/);
+  assert.match(text, /CETOPROFENO 25 MG\/G -+ 1 TB/);
   assert.doesNotMatch(text, /— GEL/);
   assert.doesNotMatch(text, /Quantidade:/i);
 });
@@ -52,13 +52,14 @@ test('prescription line omits dosage form while aligning quantities', () => {
   const lines = prescription.format([dip500, keto100]).split('\n');
   const dipLine = lines.find(line => line.includes('DIPIRONA 500 MG'));
   const ketoLine = lines.find(line => line.includes('CETOPROFENO 100 MG'));
-  assert.match(dipLine, /^1\. DIPIRONA 500 MG -+ 20 COMPRIMIDOS$/);
-  assert.match(ketoLine, /^2\. CETOPROFENO 100 MG -+ 10 COMPRIMIDOS$/);
-  assert.equal(dipLine.indexOf('20 COMPRIMIDOS'), ketoLine.indexOf('10 COMPRIMIDOS'));
+  assert.match(dipLine, /^1\. DIPIRONA 500 MG -+ 20 CP$/);
+  assert.match(ketoLine, /^2\. CETOPROFENO 100 MG -+ 10 CP$/);
+  assert.equal(dipLine.indexOf('20 CP'), ketoLine.indexOf('10 CP'));
   assert.equal(dip500.label, 'Dipirona 500 mg — comprimido');
   assert.equal(keto100.label, 'Cetoprofeno 100 mg — comprimido entérico');
   const extended = create({ ...selection(keto, 'keto-150'), days: 5, mode: 'manual', manualQuantity: 5 });
-  assert.match(prescription.format([extended]), /CETOPROFENO 150 MG — LIBERAÇÃO PROLONGADA/);
+  assert.match(prescription.format([extended]), /CETOPROFENO 150 MG -+ 5 CP/);
+  assert.doesNotMatch(prescription.format([extended]), /LIBERAÇÃO PROLONGADA/);
 });
 
 test('adding the same regimen replaces it and a different presentation remains', () => {

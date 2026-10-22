@@ -75,12 +75,12 @@ test('duration calculates exact and closed pack quantities', () => {
   assert.deepEqual(quantity.calculate({ units: 20, unit: 'gotas', unitsPerMl: 20, intervalHours: 6, days: 2, packSize: 10 }), { required: 8, closedPack: 10, packs: 1, unit: 'mL' });
 });
 
-test('as-needed instruction retains the selected regimen and duration', () => {
+test('as-needed instruction retains regimen and uses period only for quantity', () => {
   const p = medication.presentation(dip, 'dip-500');
   const regimen = medication.regimen(p, 'adult');
   const plan = quantity.plan({ presentation: p, regimen, dose: regimen.dose, days: 5 });
   const item = prescription.createItem({ medicine: dip, presentation: p, regimen, dose: regimen.dose, days: 5, dispensing: quantity.select(plan, { kind: 'suggested' }) });
-  assert.match(item.instruction, /DE 6\/6H POR 5 DIAS SE NECESSÁRIO\./);
+  assert.match(item.instruction, /DE 6\/6H SE DOR OU FEBRE\./);
   assert.equal(item.quantity, 30);
 });
 

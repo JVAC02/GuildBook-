@@ -24,10 +24,10 @@ try {
   assert.deepEqual(nav, ['home', 'medications', 'builder', 'favorites']);
 
   await page.getByRole('button', { name: 'Abrir Dipirona' }).click();
-  await page.locator('#presentation').selectOption('dip-1000');
+  await page.locator('[data-presentation=\"dip-1000\"]').click();
   assert.equal(await page.getByText('Texto para prescrição').count(), 0);
   assert.equal(await page.locator('#add-builder').isEnabled(), false);
-  await page.locator('input[name="dispense"][data-package-size="10"]').check();
+  await page.locator('#dispense-choice').selectOption('package:10');
   await page.getByRole('button', { name: /Adicionar ao montador/ }).click();
   assert.match(await page.locator('#toast').innerText(), /Adicionado ao montador/);
   assert.match(await page.locator('.desktop-nav [data-view="builder"]').innerText(), /1/);
@@ -36,7 +36,7 @@ try {
 
   await page.locator('.desktop-nav [data-view="medications"]').click();
   await page.getByRole('button', { name: 'Abrir Cetoprofeno' }).click();
-  await page.locator('#presentation').selectOption('keto-100');
+  await page.locator('[data-presentation=\"keto-100\"]').click();
   await page.locator('#duration').fill('5');
   await page.getByRole('button', { name: /Adicionar ao montador/ }).click();
   await page.locator('.desktop-nav [data-view="builder"]').click();
@@ -51,8 +51,8 @@ try {
   assert.match(preview, /^RECEITUÁRIO SIMPLES/);
   assert.match(preview, /PRESCRIÇÃO:/);
   assert.doesNotMatch(preview, /CNES:|VIA DIGITAL/);
-  assert.match(preview, /DIPIRONA 1 G -+ 10 COMPRIMIDOS/);
-  assert.match(preview, /CETOPROFENO 100 MG -+ 20 COMPRIMIDOS/);
+  assert.match(preview, /DIPIRONA 1 G -+ 10 CP/);
+  assert.match(preview, /CETOPROFENO 100 MG -+ 20 CP/);
   assert.doesNotMatch(preview, /QTDE A DEFINIR/);
   assert.doesNotMatch(preview, /CETOPROFENO 100 MG — COMPRIMIDO ENTÉRICO/);
   assert.doesNotMatch(preview, /Quantidade:/i);
@@ -84,8 +84,8 @@ try {
   assert.doesNotMatch(JSON.stringify(await page.evaluate(() => localStorage)), /Maria da Silva|Dra\. Ana|Clínica A/);
   await page.locator('.desktop-nav [data-view="medications"]').click();
   await page.getByRole('button', { name: 'Abrir Cetoprofeno' }).click();
-  await page.locator('#presentation').selectOption('keto-gel');
-  await page.locator('input[name="dispense"][data-package-size="30"]').check();
+  await page.locator('[data-presentation=\"keto-gel\"]').click();
+  await page.locator('#dispense-choice').selectOption('package:30');
   await page.locator('#add-builder').click();
   await page.locator('.desktop-nav [data-view="builder"]').click();
   assert.equal(await page.locator('.builder-item').count(), 3);
@@ -96,8 +96,8 @@ try {
   const alignedLines = (await page.locator('#builder-preview').textContent()).split('\n');
   const dipLine = alignedLines.find(line => line.includes('DIPIRONA 1 G'));
   const ketoLine = alignedLines.find(line => line.includes('CETOPROFENO 100 MG'));
-  assert.match(dipLine, /DIPIRONA 1 G -+ 20 COMPRIMIDOS/);
-  assert.equal(dipLine.indexOf('20 COMPRIMIDOS'), ketoLine.indexOf('20 COMPRIMIDOS'));
+  assert.match(dipLine, /DIPIRONA 1 G -+ 20 CP/);
+  assert.equal(dipLine.indexOf('20 CP'), ketoLine.indexOf('20 CP'));
   await shot('13-desktop-quantidades-alinhadas.png');
   await page.setViewportSize({ width: 390, height: 844 });
   await overflow();
@@ -143,8 +143,8 @@ try {
   assert.equal(await page.locator('.builder-item').count(), 0);
   await page.goto(pathToFileURL(resolve('GuildBook-Core-v7.html')).href);
   await page.getByRole('button', { name: 'Abrir Dipirona' }).click();
-  await page.locator('#presentation').selectOption('dip-1000');
-  await page.locator('input[name="dispense"][data-package-size="10"]').check();
+  await page.locator('[data-presentation=\"dip-1000\"]').click();
+  await page.locator('#dispense-choice').selectOption('package:10');
   await page.locator('#add-builder').click();
   await page.locator('.mobile-nav [data-view="builder"]').click();
   assert.equal(await page.locator('.builder-item').count(), 1);
