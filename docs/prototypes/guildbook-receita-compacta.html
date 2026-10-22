@@ -1,0 +1,341 @@
+<div id="gb-flow">
+  <header class="gb-header"><div class="gb-brand"><span class="gb-mark">✚</span> GuildBook <small>CORE V7</small></div><span class="gb-demo">Protótipo interativo</span></header>
+  <main class="gb-main">
+    <div class="gb-heading"><div><span class="gb-kicker">BIBLIOTECA</span><h1>Medicamentos</h1></div><div class="gb-pop" aria-label="População"><button type="button" data-pop="adult" aria-pressed="true">Adulto</button><button type="button" data-pop="pediatric" aria-pressed="false">Pediatria</button></div></div>
+    <label class="gb-search"><span aria-hidden="true">⌕</span><input id="gb-search" type="search" placeholder="Buscar medicamento ou nome comercial" aria-label="Buscar medicamento"></label>
+    <div id="gb-patient" hidden><label>Idade (meses)<input id="gb-age" type="number" min="0" step="1" inputmode="numeric"></label><label>Peso (kg)<input id="gb-weight" type="number" min="0.1" step="0.1" inputmode="decimal"></label></div>
+    <div class="gb-list-label"><span>2 medicamentos</span><span>Selecione para ver as apresentações</span></div>
+    <div id="gb-list"></div>
+    <p class="gb-foot">Demonstração de interface · Dados do Core v7, sem nova validação clínica. Sem emissão de receita.</p>
+  </main>
+</div>
+<style>
+#gb-flow{--gb-ink:#19333d;--gb-muted:#5d747e;--gb-teal:#0c766e;--gb-line:#dbe6e6;color:var(--gb-ink);background:#f4f7f7;font-family:Manrope,'Segoe UI',sans-serif;font-size:14px;line-height:1.5;border-radius:16px;overflow:hidden;color-scheme:light}
+#gb-flow *{box-sizing:border-box}#gb-flow [hidden]{display:none!important}#gb-flow button,#gb-flow input,#gb-flow select{font:inherit}#gb-flow button{cursor:pointer}#gb-flow button:focus-visible,#gb-flow input:focus-visible,#gb-flow select:focus-visible,#gb-flow summary:focus-visible{outline:3px solid #62bcb1;outline-offset:2px}
+#gb-flow .gb-header{background:#102c36;color:#fff;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}#gb-flow .gb-brand{display:flex;align-items:center;gap:9px;font-size:22px;font-weight:700;letter-spacing:-.6px}#gb-flow .gb-brand small{font-size:10px;letter-spacing:1px;font-weight:500;color:#a6c7c8}#gb-flow .gb-mark{display:grid;place-items:center;width:32px;height:32px;border:1px solid #79cabf;border-radius:10px;color:#a9e5db}#gb-flow .gb-demo{font-size:12px;color:#bad4d6}
+#gb-flow .gb-main{max-width:800px;margin:auto;padding:26px 24px 18px}#gb-flow .gb-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}#gb-flow .gb-kicker{font-size:10px;letter-spacing:1.7px;font-weight:700;color:var(--gb-teal)}#gb-flow h1{font-size:26px;letter-spacing:-1px;margin:2px 0 0;line-height:1.2}#gb-flow .gb-pop{display:flex;gap:3px;background:#e7eeee;border-radius:9px;padding:3px}#gb-flow .gb-pop button{border:0;background:transparent;color:var(--gb-muted);padding:8px 12px;border-radius:7px;font-size:12px;min-height:40px}#gb-flow .gb-pop button[aria-pressed=true]{background:#fff;color:var(--gb-teal);box-shadow:0 1px 4px #19333d12}
+#gb-flow .gb-search{display:flex;align-items:center;gap:10px;border:1px solid #cadeda;border-radius:11px;background:#fff;padding:0 14px}#gb-flow .gb-search span{font-size:26px;color:var(--gb-teal)}#gb-flow .gb-search input{border:0;min-width:0;width:100%;background:transparent;padding:14px 0;font-size:16px;color:var(--gb-ink)}#gb-flow .gb-list-label{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:var(--gb-muted);margin:19px 0 9px;flex-wrap:wrap}
+#gb-flow .gb-med{background:#fff;border:1px solid var(--gb-line);border-radius:12px;margin-bottom:11px;overflow:hidden}#gb-flow .gb-med.open{border-color:#a8cfc7}#gb-flow .gb-med-head{width:100%;display:flex;align-items:center;gap:12px;background:transparent;border:0;text-align:left;padding:17px;color:var(--gb-ink);min-height:80px}#gb-flow .gb-initial{display:grid;place-items:center;flex-shrink:0;width:40px;height:40px;border-radius:10px;background:#e8f4f1;color:var(--gb-teal);font-weight:700;font-size:12px}#gb-flow .gb-name{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}#gb-flow .gb-name strong{font-size:16px;font-weight:600}#gb-flow .gb-name small{color:var(--gb-muted);font-size:12px}#gb-flow .gb-chevron{font-size:20px;color:var(--gb-teal)}
+#gb-flow .gb-expanded{padding:0 17px 16px}#gb-flow .gb-presentations{display:flex;flex-wrap:wrap;gap:7px;padding-top:4px}#gb-flow .gb-presentations button{padding:8px 11px;min-height:44px;border:1px solid var(--gb-line);border-radius:8px;background:#fff;color:var(--gb-ink);font-size:12px;text-align:left}#gb-flow .gb-presentations button[aria-pressed=true]{background:#e9f5f1;border-color:var(--gb-teal);color:#075c56}#gb-flow .gb-editor{border-top:1px solid #e8efed;margin-top:16px;padding-top:15px}#gb-flow .gb-scheme{font-size:13px;margin:0 0 12px}#gb-flow .gb-scheme span{color:var(--gb-muted)}#gb-flow .gb-fields,#gb-flow #gb-patient{display:grid;grid-template-columns:1fr 1fr;gap:12px}#gb-flow #gb-patient{margin-top:13px}#gb-flow label{display:block}#gb-flow .gb-fields label,#gb-flow #gb-patient label{font-size:12px;color:var(--gb-muted)}#gb-flow .gb-fields input,#gb-flow .gb-fields select,#gb-flow #gb-patient input{display:block;width:100%;min-width:0;margin-top:5px;border:1px solid #cfdedd;border-radius:8px;background:#fff;color:var(--gb-ink);padding:9px;font-size:16px;min-height:44px}#gb-flow .gb-full{grid-column:1/-1}#gb-flow .gb-output-label{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:16px 0 7px;font-size:11px;letter-spacing:.4px;color:var(--gb-muted)}#gb-flow .gb-output-label span:last-child{letter-spacing:0}#gb-flow .gb-preview{white-space:pre-wrap;overflow-wrap:anywhere;border-left:2px solid #98c6bc;padding:3px 0 3px 12px;font-family:inherit;font-size:13px;line-height:1.65;margin:0;color:var(--gb-ink)}#gb-flow .gb-hint{font-size:12px;color:var(--gb-muted);margin:9px 0 0}#gb-flow .gb-error{color:#9a4c20}#gb-flow details{margin-top:14px;border-top:1px solid #e8efed;padding-top:5px;font-size:12px}#gb-flow summary{color:var(--gb-teal);min-height:40px;display:flex;align-items:center;cursor:pointer}#gb-flow summary:before{content:'＋';margin-right:6px}#gb-flow details[open] summary:before{content:'−'}#gb-flow .gb-detail-content{color:var(--gb-muted);overflow-wrap:anywhere}#gb-flow ul{padding-left:18px;margin:6px 0 12px}#gb-flow li{margin-bottom:5px}#gb-flow a{color:var(--gb-teal)}#gb-flow .gb-foot{font-size:11px;color:var(--gb-muted);margin:18px 0 0}#gb-flow .gb-empty{padding:22px 0;color:var(--gb-muted)}
+@media(max-width:480px){#gb-flow .gb-main{padding:21px 14px 16px}#gb-flow .gb-header{padding:15px}#gb-flow .gb-demo{font-size:11px}#gb-flow h1{font-size:23px}#gb-flow .gb-med-head{padding:14px}#gb-flow .gb-expanded{padding:0 14px 14px}#gb-flow .gb-pop button{padding:7px 9px}#gb-flow .gb-brand{font-size:20px}#gb-flow .gb-list-label{font-size:11px}#gb-flow .gb-fields{gap:10px}}
+#gb-flow .gb-heading{flex-wrap:wrap}#gb-flow .gb-fields,#gb-flow #gb-patient{grid-template-columns:repeat(2,minmax(0,1fr))}#gb-flow .gb-fields label{min-width:0}
+</style>
+<script>
+(() => {
+  const ns = globalThis.GuildBookCore ||= {};
+  const rounded = value => Math.round((value + Number.EPSILON) * 100) / 100;
+  function calculate({ units, unit, unitsPerMl, intervalHours, days, packSize }) {
+    if (![units, intervalHours, days].every(value => Number.isFinite(value) && value > 0) || 24 % intervalHours !== 0) return null;
+    const liquid = unit === 'gotas' && Number.isFinite(unitsPerMl) && unitsPerMl > 0;
+    const required = rounded((units / (liquid ? unitsPerMl : 1)) * (24 / intervalHours) * days);
+    const packs = Number.isFinite(packSize) && packSize > 0 ? Math.ceil(required / packSize) : null;
+    return { required, closedPack: packs === null ? null : rounded(packs * packSize), packs, unit: liquid ? 'mL' : unit };
+  }
+  const fmt = value => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value);
+  const singular = unit => ({ comprimidos: 'comprimido', cápsulas: 'cápsula', gotas: 'gota' })[unit] || unit;
+  const plural = (unit, count) => count === 1 ? unit : ({ comprimido: 'comprimidos', cápsula: 'cápsulas', gota: 'gotas', frasco: 'frascos', caixa: 'caixas', bisnaga: 'bisnagas' })[unit] || unit;
+  const measure = (amount, unit) => `${fmt(amount)} ${({comprimido:'CP',comprimidos:'CP','cápsula':'CAP','cápsulas':'CAP',ampola:'AMP','frasco-ampola':'FA',frasco:'FR',caixa:'CX',bisnaga:'TB',mL:'mL',g:'g',gota:'GOTAS',gotas:'GOTAS'})[unit] || unit}`;
+  function packageText(packages, container, sizeUnit) {
+    return container ? measure(packages.reduce((sum, item) => sum + item.count, 0), container) : measure(rounded(packages.reduce((sum, item) => sum + item.size * item.count, 0)), sizeUnit);
+  }
+  function suggestPack(required, sizes) {
+    if (!Number.isFinite(required) || required <= 0 || !sizes.length) return null;
+    const decimals = value => (String(value).split('.')[1] || '').length;
+    const scale = 10 ** Math.min(2, Math.max(decimals(required), ...sizes.map(decimals)));
+    const target = Math.ceil(required * scale - 1e-8);
+    const steps = sizes.map(size => Math.round(size * scale));
+    const limit = Math.ceil(target / steps[0]) * steps[0];
+    const best = new Array(limit + 1);
+    best[0] = new Array(sizes.length).fill(0);
+    for (let sum = 0; sum <= limit; sum++) {
+      if (!best[sum]) continue;
+      for (let index = 0; index < steps.length; index++) {
+        const next = sum + steps[index];
+        if (next > limit) continue;
+        const candidate = best[sum].slice();
+        candidate[index]++;
+        if (!best[next] || candidate.reduce((a, b) => a + b, 0) < best[next].reduce((a, b) => a + b, 0)) best[next] = candidate;
+      }
+    }
+    const total = best.findIndex((combination, sum) => sum >= target && combination);
+    return total < 0 ? null : best[total].flatMap((count, index) => count ? [{ size: sizes[index], count }] : []);
+  }
+  function plan({ presentation, regimen, dose, days }) {
+    const policy = presentation.quantityPolicy || (regimen.quantityKind === 'facility' ? 'none' : regimen.quantityKind === 'variable' ? 'manual' : 'calculate');
+    const sizeUnit = presentation.packageSizeUnit || (['mL', 'g'].includes(presentation.packageUnit) ? presentation.packageUnit : dose?.unit === 'gotas' ? 'mL' : dose?.unit);
+    const container = presentation.packageSizeUnit ? presentation.packageUnit || null : null;
+    const sizes = [...new Set((presentation.packageSizes || []).filter(size => Number.isFinite(size) && size > 0))].sort((a, b) => a - b);
+    const validDays = Number.isInteger(Number(days)) && Number(days) > 0 && Number(days) <= (regimen.durationKind === 'max7' ? 7 : 365);
+    const unitsPerMl = dose?.unit === 'gotas' && Number.isFinite(dose?.volumeMl) && dose.volumeMl > 0 ? dose.units / dose.volumeMl : undefined;
+    const calculated = policy === 'calculate' && dose && validDays ? calculate({ units: dose.units, unit: dose.unit, unitsPerMl, intervalHours: regimen.intervalHours, days: Number(days) }) : null;
+    const required = calculated?.required ?? null;
+    const suggestion = suggestPack(required, sizes);
+    return { policy, required, isMaximum: regimen.quantityKind === 'maximum', unit: singular(calculated?.unit || sizeUnit) || null, container, sizes, options: sizes.map(size => ({ size, label: packageText([{ size, count: 1 }], container, sizeUnit) })), suggestion, canFractionate: presentation.canFractionate === true };
+  }
+  function select(plan, { kind, size, amount } = {}) {
+    if (plan.policy === 'none' || !plan.unit) return null;
+    if (kind === 'suggested' && plan.required != null) {
+      if (!plan.suggestion) return { quantity: plan.required, unit: plan.unit, text: measure(plan.required, plan.unit), method: 'automatic', packages: [] };
+      const quantity = rounded(plan.suggestion.reduce((sum, item) => sum + item.size * item.count, 0));
+      return { quantity, unit: plan.unit, text: packageText(plan.suggestion, plan.container, plan.unit), method: 'automatic', packages: plan.suggestion };
+    }
+    if (kind === 'package' && plan.sizes.includes(size) && (plan.required == null || size >= plan.required)) return { quantity: size, unit: plan.unit, text: packageText([{ size, count: 1 }], plan.container, plan.unit), method: 'confirmed-package', packages: [{ size, count: 1 }] };
+    if (kind === 'manual' && Number.isFinite(amount) && amount > 0 && (plan.canFractionate || !['comprimido', 'cápsula'].includes(plan.unit) || Number.isInteger(amount))) return { quantity: amount, unit: plan.unit, text: measure(amount, plan.unit), method: 'manual', packages: [] };
+    return null;
+  }
+  ns.quantity = { calculate, suggestPack, plan, select, measure, packageText };
+})();
+
+(() => {
+  const ns = globalThis.GuildBookCore ||= {};
+  const number = value => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value);
+  const abbreviation = unit => ({ comprimido: 'CP', cápsula: 'CAP', ampola: 'AMP', 'frasco-ampola': 'FR', mL: 'mL', g: 'G', gotas: 'GOTAS' })[unit] || unit.toUpperCase();
+  const routeName = route => ({ oral: 'USO ORAL', tópica: 'USO TÓPICO', intramuscular: 'USO INTRAMUSCULAR', intravenosa: 'USO INTRAVENOSO', inalatória: 'USO INALATÓRIO', nasal: 'USO NASAL', oftálmica: 'USO OFTÁLMICO', otológica: 'USO OTOLÓGICO', vaginal: 'USO VAGINAL' })[route] || `USO ${route.toUpperCase()}`;
+  const doseAmount = value => number(value);
+  function instruction(item) {
+    const asNeeded = item.intervalText.endsWith(', se necessário');
+    let interval = asNeeded ? item.intervalText.slice(0, -', se necessário'.length) : item.intervalText;
+    interval = interval.replace(/^a cada (\d+) horas?/, (_, hours) => `de ${hours}/${hours}h`).replace(/^uma vez ao dia/, '1 vez ao dia');
+    const use = item.route === 'tópica'
+      ? `Aplicar na área afetada ${interval}`
+      : `${item.verb} ${doseAmount(item.dose.units)} ${abbreviation(item.dose.unit)} ${interval}`;
+    const symptomaticDipyrone = asNeeded && item.medicineId === 'dipirona';
+    return `${use}${item.durationDays && !symptomaticDipyrone ? ` por ${item.durationDays} ${item.durationDays === 1 ? 'dia' : 'dias'}` : ''}${asNeeded ? symptomaticDipyrone ? ' se dor ou febre' : ' se necessário' : ''}.`.toUpperCase();
+  }
+  function createItem({ medicine, presentation, regimen, dose, days, dispensing }) {
+    if (!medicine || !presentation || !regimen || !dose || presentation.context !== 'ambulatory' || !dispensing || !(dispensing.quantity > 0)) return null;
+    const durationDays = Number.isInteger(Number(days)) && Number(days) > 0 && Number(days) <= (regimen.durationKind === 'max7' ? 7 : 365) ? Number(days) : null;
+    const item = {
+      key: `${medicine.id}/${presentation.id}/${regimen.id}`, medicineId: medicine.id, medicineName: medicine.name,
+      presentationId: presentation.id, regimenId: regimen.id, population: regimen.population,
+      label: presentation.label, concentration: presentation.concentration, form: presentation.form,
+      route: presentation.route, dose: { units: dose.units, unit: dose.unit, mg: dose.mg, volumeMl: dose.volumeMl ?? null },
+      intervalText: regimen.intervalText, intervalHours: regimen.intervalHours ?? null,
+      durationKind: regimen.durationKind, quantityKind: regimen.quantityKind, verb: regimen.verb || 'Tomar',
+      durationDays, quantity: dispensing.quantity, quantityUnit: dispensing.unit, quantityText: dispensing.text,
+      quantityMethod: dispensing.method, packageSizes: presentation.packageSizes || [], packageUnit: presentation.packageUnit || null,
+      packageSizeUnit: presentation.packageSizeUnit || null, quantityPolicy: presentation.quantityPolicy || null,
+      canFractionate: presentation.canFractionate === true
+    };
+    item.instruction = instruction(item);
+    return item;
+  }
+  function updateItem(item, { days, quantity }) {
+    const durationDays = Number.isInteger(Number(days)) && Number(days) > 0 && Number(days) <= (item.durationKind === 'max7' ? 7 : 365) ? Number(days) : null;
+    const presentation = { packageSizes: item.packageSizes || [], packageUnit: item.packageUnit, packageSizeUnit: item.packageSizeUnit, quantityPolicy: item.quantityPolicy, canFractionate: item.canFractionate };
+    const regimen = { quantityKind: item.quantityKind, intervalHours: item.intervalHours, durationKind: item.durationKind };
+    const plan = ns.quantity.plan({ presentation, regimen, dose: item.dose, days: durationDays });
+    const dispensing = quantity !== '' ? ns.quantity.select(plan, { kind: 'manual', amount: Number(quantity) }) : durationDays ? ns.quantity.select(plan, { kind: 'suggested' }) : item.quantityMethod === 'confirmed-package' ? { quantity: item.quantity, unit: item.quantityUnit, text: item.quantityText, method: item.quantityMethod } : null;
+    if (!dispensing) return null;
+    const updated = { ...item, durationDays, quantity: dispensing.quantity, quantityUnit: dispensing.unit, quantityText: dispensing.text, quantityMethod: dispensing.method };
+    updated.instruction = instruction(updated);
+    return updated;
+  }
+  function upsert(items, item) {
+    const index = items.findIndex(existing => existing.key === item.key);
+    if (index < 0) return [...items, item];
+    return items.map((existing, position) => position === index ? item : existing);
+  }
+  function remove(items, key) { return items.filter(item => item.key !== key); }
+  function prescriptionName(item) {
+    return item.label.split(' — ')[0];
+  }
+  function formatSections(items, patient = '', details = {}) {
+    const title = 'RECEITUÁRIO SIMPLES\n\n';
+    const intro = `PACIENTE: ${patient.trim() || '________________________________'}\n\nPRESCRIÇÃO:\n\n`;
+    const parts = [];
+    const routes = [...new Set(items.map(item => item.route))];
+    for (const route of routes) {
+      parts.push(routeName(route), '');
+      items.filter(item => item.route === route).forEach((item, index) => {
+        const amount = item.quantityText ? item.quantityText.toUpperCase() : item.quantity == null ? 'QUANTIDADE PENDENTE' : ns.quantity.measure(item.quantity, item.quantityUnit).toUpperCase();
+        const name = `${index + 1}. ${prescriptionName(item).toUpperCase()}`;
+        const dashes = '-'.repeat(Math.max(4, 40 - name.length - 2));
+        parts.push(`${name} ${dashes} ${amount}`, `   ${item.instruction}`, '');
+      });
+    }
+    const body = `${parts.join('\n')}\n`;
+    const provided = value => String(value || '').trim();
+    const line = fields => fields.filter(([, value]) => provided(value)).map(([label, value]) => `${label}: ${provided(value)}`).join('    ');
+    const optional = [
+      line([['NOME DO(A) MÉDICO(A)', details.doctorName]]),
+      line([['CRM', details.crm], ['UF', details.doctorUf]]),
+      line([['LOCAL DE ATENDIMENTO', details.serviceName], ['CNES', details.cnes]]),
+      line([['ENDEREÇO', details.address], ['BAIRRO', details.neighborhood]]),
+      line([['CIDADE', details.city], ['UF', details.serviceUf], ['TELEFONE', details.phone]])
+    ].filter(Boolean);
+    const iso = provided(details.issuedAt);
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}/${iso.slice(0, 4)}` : '__/__/____';
+    const needsIdentification = !provided(details.doctorName) || !provided(details.crm) || !provided(details.doctorUf);
+    const footer = `DATA DE EMISSÃO: ${date}\n\n${optional.length ? `${optional.join('\n')}\n\n` : ''}________________________________________\nASSINATURA DO(A) MÉDICO(A)${needsIdentification ? '\nNOME E CRM/UF: __________________________' : ''}`;
+    return { title, intro, body, footer };
+  }
+  function format(items, patient = '', details = {}) { return Object.values(formatSections(items, patient, details)).join(''); }
+  ns.prescription = { createItem, updateItem, upsert, remove, format, formatSections, instruction, abbreviation, routeName };
+})();
+
+(() => {
+  const ns = globalThis.GuildBookCore ||= {};
+  const rounded = value => Math.round((value + Number.EPSILON) * 100) / 100;
+  function eligible(presentation, regimen, { weightKg, ageMonths } = {}) {
+    if (regimen.population !== 'pediatric') return null;
+    const pediatric = presentation?.pediatric || {};
+    const dose = regimen.dose;
+    if (pediatric.pediatricAllowed === false || (pediatric.doseKind && pediatric.doseKind !== dose.kind)) return false;
+    for (const bounds of [pediatric, dose]) {
+      if (Number.isFinite(ageMonths) && (bounds.minAgeMonths != null && ageMonths < bounds.minAgeMonths || bounds.maxAgeMonths != null && ageMonths >= bounds.maxAgeMonths)) return false;
+      if (Number.isFinite(weightKg) && (bounds.minWeightKg != null && weightKg < bounds.minWeightKg || bounds.maxWeightKg != null && weightKg > bounds.maxWeightKg)) return false;
+    }
+    if (dose.kind === 'weightBands' && Number.isFinite(weightKg) && !dose.bands.some(row => weightKg >= row.minKg && weightKg <= row.maxKg)) return false;
+    return true;
+  }
+  function resolve(regimen, { weightKg, ageMonths, chosenUnits } = {}, presentation) {
+    if (!eligible(presentation, regimen, { weightKg, ageMonths })) return null;
+    const dose = regimen.dose;
+    const pediatric = presentation?.pediatric || {};
+    if ([pediatric, dose].some(bounds => (bounds.minAgeMonths != null || bounds.maxAgeMonths != null) && !Number.isFinite(ageMonths))) return null;
+    if ([pediatric, dose].some(bounds => (bounds.minWeightKg != null || bounds.maxWeightKg != null) && !Number.isFinite(weightKg))) return null;
+    const unitsForMg = (mg, strengthMg) => {
+      if (!Number.isFinite(mg) || mg <= 0 || !Number.isFinite(strengthMg) || strengthMg <= 0) return null;
+      const rawUnits = mg / strengthMg;
+      const units = rounded(rawUnits);
+      if (Math.abs(rawUnits - units) > 1e-6 || units <= 0) return null;
+      const fraction = rounded(units % 1);
+      if (dose.unit === 'comprimido' || dose.unit === 'cápsula') {
+        if (fraction && (pediatric.mustSwallowWhole || pediatric.canSplit !== true || !pediatric.allowedFractions?.includes(fraction))) return null;
+      } else if (dose.unit === 'gotas' && fraction) return null;
+      return { units, mg: rounded(mg), unit: dose.unit };
+    };
+    if (dose.kind === 'fixed') {
+      if (Number.isFinite(dose.units) && Number.isFinite(dose.mg)) {
+        const fraction = rounded(dose.units % 1);
+        if (fraction && (dose.unit === 'comprimido' || dose.unit === 'cápsula') && (pediatric.mustSwallowWhole || pediatric.canSplit !== true || !pediatric.allowedFractions?.includes(fraction))) return null;
+        return dose;
+      }
+      return unitsForMg(dose.fixedDose ?? pediatric.fixedDose, dose.strengthMg ?? pediatric.strengthMg);
+    }
+    if (dose.kind === 'perKg') {
+      const perKg = dose.dosePerKg ?? pediatric.dosePerKg;
+      if (!Number.isFinite(weightKg) || weightKg <= 0 || !Number.isFinite(perKg) || perKg <= 0) return null;
+      const mg = Math.min(weightKg * perKg, dose.maxDose ?? pediatric.maxDose ?? Infinity);
+      return unitsForMg(mg, dose.strengthMg ?? pediatric.strengthMg);
+    }
+    if (!Number.isFinite(ageMonths) && (dose.kind === 'ageWeightDrops' || dose.minAgeMonths != null || dose.maxAgeMonths != null)) return null;
+    if (dose.kind === 'weightBands') {
+      if (!Number.isFinite(weightKg) || weightKg <= 0) return null;
+      const band = dose.bands.find(row => weightKg >= row.minKg && weightKg <= row.maxKg);
+      if (!band) return null;
+      const units = chosenUnits === undefined ? band.minUnits : Number(chosenUnits);
+      if (units < band.minUnits || units > band.maxUnits || !Number.isFinite(units)) return null;
+      return { units, mg: rounded(units * dose.mgPerUnit), unit: dose.unit, range: [band.minUnits, band.maxUnits], volumeMl: dose.unitsPerMl ? rounded(units / dose.unitsPerMl) : units };
+    }
+    if (dose.kind === 'ageWeightDrops') {
+      if (ageMonths < dose.fixedFromMonths && (!Number.isFinite(weightKg) || weightKg <= 0)) return null;
+      const units = ageMonths >= dose.fixedFromMonths ? dose.fixedUnits : weightKg * dose.unitsPerKg;
+      if (!Number.isInteger(units) || units <= 0) return null;
+      return { units, mg: rounded(units * dose.mgPerUnit), unit: dose.unit, volumeMl: rounded(units / dose.unitsPerMl) };
+    }
+    return null;
+  }
+  ns.pediatric = { eligible, resolve };
+})();
+
+(() => {
+  const ns = globalThis.GuildBookCore ||= {};
+  function presentation(medicine, id) { return medicine.presentations.find(item => item.id === id) || null; }
+  function populations(item) { return [...new Set(item.regimens.map(row => row.population))]; }
+  function presentationsForPopulation(medicine, population, { ageMonths, weightKg } = {}) {
+    return medicine.presentations.filter(item => item.regimens.some(row => {
+      if (row.population !== population) return false;
+      if (population !== 'pediatric') return true;
+      return ns.pediatric.eligible(item, row, { ageMonths, weightKg });
+    }));
+  }
+  function regimen(item, population, id) { return item.regimens.find(row => row.population === population && (!id || row.id === id)) || null; }
+  function normalize(value) { return String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+  function search(items, query) {
+    const term = normalize(query);
+    if (!term) return items;
+    return items.map(item => {
+      const name = normalize(item.name);
+      const aliases = (item.aliases || []).map(normalize);
+      const rank = name === term ? 0 : name.startsWith(term) ? 1 : aliases.some(a => a === term) ? 2 : aliases.some(a => a.includes(term)) ? 3 : name.includes(term) ? 4 : 99;
+      return { item, rank };
+    }).filter(row => row.rank < 99).sort((a, b) => a.rank - b.rank).map(row => row.item);
+  }
+  ns.medication = { presentation, populations, presentationsForPopulation, regimen, search };
+})();
+
+(() => {
+const medicines=[{"id":"dipirona","name":"Dipirona","aliases":["metamizol","novalgina"],"category":"Analgésico e antitérmico","class":"Derivado pirazolônico","brands":["Novalgina"],"indications":["Dor","Febre"],"presentations":[{"id":"dip-500","label":"Dipirona 500 mg — comprimido","form":"comprimido","concentration":"500 mg","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[30,100],"sourceIds":["novalgina-tablets"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":500},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 g/dia (8 comprimidos de 500 mg).","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}]},{"id":"dip-1000","label":"Dipirona 1 g — comprimido","form":"comprimido","concentration":"1 g","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[10,20],"sourceIds":["novalgina-tablets"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":1000},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 g/dia (4 comprimidos de 1 g).","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}]},{"id":"dip-drops","label":"Dipirona 500 mg/mL — gotas","form":"solução oral em gotas","concentration":"500 mg/mL · 25 mg/gota","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[10,20],"packageUnit":"mL","sourceIds":["ache-drops"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":20,"unit":"gotas","mg":500,"volumeMl":1},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 40 gotas por dose, 4 vezes ao dia.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"},{"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"gotas","mgPerUnit":25,"unitsPerMl":20,"minAgeMonths":3,"maxAgeMonths":180,"bands":[{"minKg":5,"maxKg":8,"minUnits":2,"maxUnits":5},{"minKg":9,"maxKg":15,"minUnits":3,"maxUnits":10},{"minKg":16,"maxKg":23,"minUnits":5,"maxUnits":15},{"minKg":24,"maxKg":30,"minUnits":8,"maxUnits":20},{"minKg":31,"maxKg":45,"minUnits":10,"maxUnits":30},{"minKg":46,"maxKg":53,"minUnits":15,"maxUnits":35}]},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 tomadas/dia; limite por dose conforme faixa de peso da bula.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}]},{"id":"dip-solution","label":"Dipirona 50 mg/mL — solução oral","form":"solução oral","concentration":"50 mg/mL","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[100],"packageUnit":"mL","sourceIds":["ache-solution"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":10,"unit":"mL","mg":500,"volumeMl":10},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 20 mL por dose, 4 vezes ao dia.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"},{"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"mL","mgPerUnit":50,"minAgeMonths":3,"maxAgeMonths":180,"bands":[{"minKg":5,"maxKg":8,"minUnits":1.25,"maxUnits":2.5},{"minKg":9,"maxKg":15,"minUnits":2.5,"maxUnits":5},{"minKg":16,"maxKg":23,"minUnits":3.75,"maxUnits":7.5},{"minKg":24,"maxKg":30,"minUnits":5,"maxUnits":10},{"minKg":31,"maxKg":45,"minUnits":7.5,"maxUnits":15},{"minKg":46,"maxKg":53,"minUnits":8.75,"maxUnits":17.5}]},"intervalHours":6,"intervalText":"a cada 6 horas, se necessário","routeText":"via oral","maxDoseText":"Até 4 tomadas/dia; limite por dose conforme faixa de peso da bula.","durationKind":"individual","quantityKind":"maximum","verb":"Tomar"}]},{"id":"dip-im","label":"Dipirona 500 mg/mL — IM","form":"solução injetável","concentration":"500 mg/mL","releaseType":"imediata","route":"intramuscular","context":"urgent","packageSizes":[],"sourceIds":["hypofarma-injectable"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":2,"unit":"mL","mg":1000},"intervalText":"dose única; repetição conforme avaliação, máximo 10 mL/dia","routeText":"via intramuscular","maxDoseText":"10 mL/dia (5 g/dia).","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"},{"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"mL","mgPerUnit":500,"minAgeMonths":3,"maxAgeMonths":180,"bands":[{"minKg":5,"maxKg":8,"minUnits":0.1,"maxUnits":0.2},{"minKg":9,"maxKg":15,"minUnits":0.2,"maxUnits":0.5},{"minKg":16,"maxKg":23,"minUnits":0.3,"maxUnits":0.8},{"minKg":24,"maxKg":30,"minUnits":0.4,"maxUnits":1},{"minKg":31,"maxKg":45,"minUnits":0.5,"maxUnits":1.5},{"minKg":46,"maxKg":53,"minUnits":0.8,"maxUnits":1.8}]},"intervalText":"até 4 vezes ao dia, se necessário","routeText":"via intramuscular","maxDoseText":"Até 4 administrações/dia, respeitando a faixa de peso.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}]},{"id":"dip-iv","label":"Dipirona 500 mg/mL — IV","form":"solução injetável","concentration":"500 mg/mL","releaseType":"imediata","route":"intravenosa","context":"hospital","packageSizes":[],"sourceIds":["hypofarma-injectable"],"preparation":"Administração IV muito lenta, no máximo 1 mL (500 mg) por minuto; paciente deitado e sob supervisão.","regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":2,"unit":"mL","mg":1000},"intervalText":"dose única; repetição conforme avaliação, máximo 10 mL/dia","routeText":"via intravenosa","maxDoseText":"10 mL/dia (5 g/dia).","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"},{"id":"pediatric","population":"pediatric","dose":{"kind":"weightBands","unit":"mL","mgPerUnit":500,"minAgeMonths":12,"maxAgeMonths":180,"bands":[{"minKg":9,"maxKg":15,"minUnits":0.2,"maxUnits":0.5},{"minKg":16,"maxKg":23,"minUnits":0.3,"maxUnits":0.8},{"minKg":24,"maxKg":30,"minUnits":0.4,"maxUnits":1},{"minKg":31,"maxKg":45,"minUnits":0.5,"maxUnits":1.5},{"minKg":46,"maxKg":53,"minUnits":0.8,"maxUnits":1.8}]},"intervalText":"até 4 vezes ao dia, se necessário","routeText":"via intravenosa","maxDoseText":"Até 4 administrações/dia, respeitando a faixa de peso.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}]}],"safety":["Contraindicada em hipersensibilidade à dipirona/pirazolonas, discrasias sanguíneas, porfiria aguda ou deficiência de G6PD.","Atenção a agranulocitose, anafilaxia e reações cutâneas graves; interromper diante de sinais sugestivos.","Evitar doses altas em insuficiência renal ou hepática; avaliar idosos e pacientes debilitados.","No uso parenteral, monitorar hipotensão e anafilaxia. Gestação e lactação exigem avaliação específica."],"sources":[{"id":"novalgina-tablets","label":"Novalgina — bula profissional, comprimidos","url":"https://uploads.consultaremedios.com.br/drug_leaflet/pro/Bula-Novalgina-Comprimido-Profissional-Consulta-Remedios.pdf"},{"id":"ache-drops","label":"Aché — bula, gotas 500 mg/mL","url":"https://www.ache.com.br/wp-content/uploads/application/pdf/bula-paciente-dipirona-monoidratada-gotas.pdf"},{"id":"ache-solution","label":"Aché — bula, solução oral 50 mg/mL","url":"https://www.ache.com.br/wp-content/uploads/application/pdf/bula-paciente-dipirona-monoidratada-solucao-oral.pdf"},{"id":"hypofarma-injectable","label":"Hypofarma — bula profissional, injetável 500 mg/mL","url":"https://hypofarma.com.br/wp-content/uploads/2025/08/dipirona_Bula_Profissional1.pdf"}]},{"id":"cetoprofeno","name":"Cetoprofeno","aliases":["profenid","ketoprofen"],"category":"Analgésico e anti-inflamatório","class":"Anti-inflamatório não esteroidal (AINE)","brands":["Profenid"],"indications":["Dor musculoesquelética","Inflamação","Dor pós-operatória"],"presentations":[{"id":"keto-50","label":"Cetoprofeno 50 mg — cápsula","form":"cápsula","concentration":"50 mg","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[24],"sourceIds":["profenid"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"cápsula","mg":50},"intervalHours":8,"intervalText":"a cada 8 horas","routeText":"via oral","maxDoseText":"300 mg/dia; usar a menor dose eficaz pelo menor tempo necessário.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]},{"id":"keto-100","label":"Cetoprofeno 100 mg — comprimido entérico","form":"comprimido revestido","concentration":"100 mg","releaseType":"retardada (entérica)","route":"oral","context":"ambulatory","packageSizes":[20],"sourceIds":["profenid"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":100},"intervalHours":12,"intervalText":"a cada 12 horas","routeText":"via oral","maxDoseText":"300 mg/dia; usar a menor dose eficaz pelo menor tempo necessário.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]},{"id":"keto-150","label":"Cetoprofeno 150 mg — liberação prolongada","form":"comprimido de duas camadas","concentration":"150 mg","releaseType":"prolongada","route":"oral","context":"ambulatory","packageSizes":[10],"sourceIds":["eurofarma-150"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":150},"intervalHours":24,"intervalText":"uma vez ao dia","routeText":"via oral","maxDoseText":"300 mg/dia; esquema de manutenção de 150 mg/dia.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]},{"id":"keto-200","label":"Cetoprofeno 200 mg — liberação retardada","form":"comprimido revestido","concentration":"200 mg","releaseType":"retardada","route":"oral","context":"ambulatory","packageSizes":[10],"sourceIds":["profenid"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"comprimido","mg":200},"intervalHours":24,"intervalText":"uma vez ao dia","routeText":"via oral","maxDoseText":"1 comprimido de 200 mg/dia para esta apresentação.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]},{"id":"keto-drops","label":"Cetoprofeno 20 mg/mL — gotas","form":"solução oral em gotas","concentration":"20 mg/mL · 1 mg/gota","releaseType":"imediata","route":"oral","context":"ambulatory","packageSizes":[20],"packageUnit":"mL","sourceIds":["eurofarma-drops"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":50,"unit":"gotas","mg":50,"volumeMl":2.5},"intervalHours":8,"intervalText":"a cada 8 horas","routeText":"via oral","maxDoseText":"300 mg/dia (300 gotas).","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"},{"id":"pediatric","population":"pediatric","dose":{"kind":"ageWeightDrops","unit":"gotas","mgPerUnit":1,"unitsPerMl":20,"unitsPerKg":1,"minAgeMonths":12,"maxAgeMonths":144,"fixedFromMonths":84,"fixedUnits":25},"intervalHours":8,"intervalText":"a cada 8 horas","routeText":"via oral","maxDoseText":"Conferir peso, faixa etária e necessidade clínica; bula: a cada 6 ou 8 horas.","durationKind":"individual","quantityKind":"scheduled","verb":"Tomar"}]},{"id":"keto-gel","label":"Cetoprofeno 25 mg/g — gel","form":"gel","concentration":"25 mg/g","releaseType":"tópica","route":"tópica","context":"ambulatory","packageSizes":[30],"packageUnit":"bisnaga","packageSizeUnit":"g","quantityPolicy":"manual","sourceIds":["medley-gel"],"regimens":[{"id":"adult","population":"adult","dose":{"kind":"topical","unit":"g"},"intervalText":"2 a 3 vezes ao dia, massageando levemente","routeText":"uso tópico","maxDoseText":"Até 15 g/dia; tratamento por no máximo 7 dias.","durationKind":"max7","quantityKind":"variable","verb":"Aplicar"}]},{"id":"keto-im","label":"Cetoprofeno 100 mg/2 mL — IM","form":"solução injetável","concentration":"50 mg/mL","releaseType":"imediata","route":"intramuscular","context":"urgent","packageSizes":[],"sourceIds":["cristalia-im"],"preparation":"Aplicar profundamente por via IM; não misturar com outros medicamentos na mesma seringa.","regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"ampola","mg":100},"intervalText":"2 vezes ao dia; pode ser 3 vezes a critério médico","routeText":"via intramuscular","maxDoseText":"300 mg/dia.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}]},{"id":"keto-iv","label":"Cetoprofeno 100 mg — IV","form":"pó liofilizado para solução injetável","concentration":"100 mg/frasco","releaseType":"imediata","route":"intravenosa","context":"hospital","packageSizes":[],"sourceIds":["cristalia-iv"],"preparation":"Dissolver 100 mg em 100–150 mL de solução isotônica de glicose ou cloreto de sódio imediatamente antes do uso; infundir lentamente em cerca de 20 minutos. Administrar separadamente de outros medicamentos.","regimens":[{"id":"adult","population":"adult","dose":{"kind":"fixed","units":1,"unit":"frasco-ampola","mg":100},"intervalText":"100 a 300 mg ao dia conforme avaliação","routeText":"via intravenosa","maxDoseText":"300 mg/dia; em cólica renal, no máximo 48 horas.","durationKind":"clinical","quantityKind":"facility","verb":"Administrar"}]}],"safety":["Contraindicado em hipersensibilidade a cetoprofeno, AAS ou outros AINEs; úlcera/hemorragia péptica e insuficiência cardíaca, renal ou hepática grave.","Evitar no terceiro trimestre de gestação. Avaliar gestação anterior e lactação individualmente.","Risco de sangramento gastrintestinal, lesão renal e interações com outros AINEs ou anticoagulantes; monitorar pacientes vulneráveis.","Gel: evitar exposição solar na área tratada e pele lesada; respeitar limite de 7 dias da bula consultada."],"sources":[{"id":"profenid","label":"Sanofi — Profenid, bula profissional (cápsula, entérico e retard)","url":"https://uploads.consultaremedios.com.br/drug_leaflet/pro/Bula-Profenid-Profissional-Consulta-Remedios.pdf"},{"id":"eurofarma-150","label":"Eurofarma — cetoprofeno 150 mg, bula profissional","url":"https://eurofarma.com.br/produtos/bulas/view/healthcare/pt/bula-cetoprofeno-comprimido.html"},{"id":"eurofarma-drops","label":"Eurofarma — cetoprofeno gotas, bula profissional","url":"https://eurofarma.com.br/produtos/bulas/view/healthcare/pt/bula-cetoprofeno-solucao-oral-gotas.html"},{"id":"medley-gel","label":"Medley — cetoprofeno gel, bula profissional","url":"https://uploads.consultaremedios.com.br/drug_leaflet/pro/Bula-Cetoprofeno-Gel-Medley-Profissional-Consulta-Rem%C3%A9dios.pdf"},{"id":"cristalia-im","label":"Cristália — cetoprofeno IM, bula profissional","url":"https://www.cristalia.com.br/index.php/produto/61/bula-profissional"},{"id":"cristalia-iv","label":"Cristália — cetoprofeno IV, bula profissional","url":"https://www.cristalia.com.br/produto/62/bula-profissional"}]}];
+const core=globalThis.GuildBookCore;
+const root=document.getElementById('gb-flow');
+const list=root.querySelector('#gb-list');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2}).format(n);
+const state={open:null,pop:'adult',query:'',age:'',weight:'',selections:{},drafts:{}};
+const values=()=>({ageMonths:state.age===''?undefined:Number(state.age),weightKg:state.weight===''?undefined:Number(state.weight)});
+const available=m=>core.medication.presentationsForPopulation(m,state.pop,values());
+const chosen=m=>available(m).find(p=>p.id===state.selections[m.id+'/'+state.pop]);
+const draft=p=>state.drafts[p.id+'/'+state.pop]??(state.drafts[p.id+'/'+state.pop]={days:'',quantity:'',units:''});
+const short=p=>p.label.split(' — ')[0].replace(/^(Dipirona|Cetoprofeno) /,'')+' · '+(/^liberação/i.test(p.label.split(' — ')[1]||'')?'comprimido':p.label.split(' — ').slice(1).join(' — '));
+function renderList(){
+ const matches=core.medication.search(medicines,state.query);
+ list.innerHTML=matches.length?matches.map(m=>{
+  const opened=state.open===m.id;const p=chosen(m);
+  return '<section class="gb-med '+(opened?'open':'')+'"><button type="button" class="gb-med-head cursor-interaction" data-med="'+m.id+'" aria-expanded="'+opened+'" aria-controls="gb-panel-'+m.id+'"><span class="gb-initial">'+(m.id==='dipirona'?'DI':'CE')+'</span><span class="gb-name"><strong>'+m.name+'</strong><small>'+esc(m.category)+'</small></span><span class="gb-chevron" aria-hidden="true">'+(opened?'−':'+')+'</span></button>'+(opened?'<div class="gb-expanded" id="gb-panel-'+m.id+'"><div class="gb-presentations" aria-label="Apresentações de '+m.name+'">'+available(m).map(x=>'<button type="button" class="cursor-interaction" data-presentation="'+x.id+'" aria-pressed="'+(p?.id===x.id)+'">'+esc(short(x))+'</button>').join('')+'</div>'+(available(m).length?'':'<p class="gb-hint">Nenhuma apresentação cadastrada para este contexto.</p>')+'<div id="gb-editor"></div><details><summary>Segurança e fontes</summary><div class="gb-detail-content"><ul>'+m.safety.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul><div id="gb-selected-source"></div><p>Conteúdo reproduzido do repositório para avaliar a interface.</p></div></details></div>':'')+'</section>';
+ }).join(''):'<p class="gb-empty">Nenhum medicamento encontrado.</p>';
+ root.querySelector('.gb-list-label span').textContent=matches.length+' '+(matches.length===1?'medicamento':'medicamentos');
+ renderEditor();
+}
+function renderEditor(){
+ const holder=root.querySelector('#gb-editor');if(!holder)return;
+ const m=medicines.find(x=>x.id===state.open),p=chosen(m);
+ const source=root.querySelector('#gb-selected-source');
+ if(source)source.innerHTML=(p?m.sources.filter(s=>p.sourceIds.includes(s.id)):m.sources).map(s=>'<p><a href="'+esc(s.url)+'" target="_blank" rel="noopener noreferrer">'+esc(s.label)+'</a></p>').join('');
+ if(source&&p)source.innerHTML='<p>'+esc(p.form)+' · Liberação '+esc(p.releaseType)+'.</p>'+source.innerHTML;
+ if(!p){holder.innerHTML='';return;}
+ const r=core.medication.regimen(p,state.pop),d=draft(p);
+ const dose=state.pop==='adult'?r.dose.kind==='fixed'?r.dose:r.dose.kind==='topical'?{units:null,unit:'g',mg:null}:null:core.pediatric.resolve(r,{...values(),chosenUnits:d.units===''?undefined:Number(d.units)},p);
+ const unitLabel=dose?.unit||r.dose.unit;
+ const initialDose=dose?.units!=null?fmt(dose.units)+' '+unitLabel:r.dose.kind==='topical'?'Aplicação na área afetada':'Informe idade e peso';
+ holder.innerHTML='<div class="gb-editor"><p class="gb-scheme"><strong>'+esc(initialDose)+'</strong> <span>· '+esc(m.id==='dipirona'?r.intervalText.replace('se necessário','se dor ou febre'):r.intervalText)+' · '+esc(r.routeText)+'</span></p>'+(p.context==='ambulatory'?'<div class="gb-fields">'+(state.pop==='pediatric'&&r.dose.kind==='weightBands'&&dose?'<label class="gb-full">Dose por tomada ('+esc(unitLabel)+')<input data-field="units" type="number" step="'+(unitLabel==='gotas'?'1':'0.05')+'" min="'+dose.range[0]+'" max="'+dose.range[1]+'" value="'+esc(d.units||dose.units)+'" inputmode="decimal"></label>':'')+'<label>'+ (m.id==='dipirona'?'Período para cálculo (dias)':'Duração (dias)') +'<input data-field="days" type="number" min="1" max="'+(r.durationKind==='max7'?7:365)+'" step="1" placeholder="Não definida" value="'+esc(d.days)+'" inputmode="numeric"></label><label>Quantidade<select data-field="quantity"><option value="">Selecionar</option>'+(!p.quantityPolicy&&r.intervalHours?'<option value="auto">Calcular pela duração</option>':'')+p.packageSizes.map(n=>'<option value="pack:'+n+'">'+esc(core.quantity.plan({presentation:p,regimen:r,dose}).options.find(x=>x.size===n)?.label||n)+'</option>').join('')+'<option value="manual">Informar quantidade</option></select></label><label class="gb-full" id="gb-manual-wrap" hidden>Quantidade ('+esc(p.packageSizeUnit||p.packageUnit||(unitLabel==='gotas'?'mL':unitLabel))+')<input data-field="manual" type="number" min="0.01" step="any" inputmode="decimal" placeholder="Quantidade total" value="'+esc(d.manual||'')+'"></label></div><div class="gb-output-label"><span>PRÉVIA</span><span>Somente demonstração</span></div><div id="gb-result" aria-live="polite"></div>':'<div class="gb-output-label"><span>USO ASSISTENCIAL</span><span>Somente demonstração</span></div><div id="gb-result" aria-live="polite"></div>')+'</div>';
+ const q=holder.querySelector('[data-field="quantity"]');if(q)q.value=d.quantity;
+ updateOutput();
+}
+function updateOutput(){
+ const m=medicines.find(x=>x.id===state.open);if(!m)return;const p=chosen(m);if(!p)return;
+ const out=root.querySelector('#gb-result');if(!out)return;
+ const r=core.medication.regimen(p,state.pop),d=draft(p);
+ const dose=state.pop==='adult'?(r.dose.kind==='fixed'?r.dose:r.dose.kind==='topical'?{units:null,unit:'g',mg:null}:null):core.pediatric.resolve(r,{...values(),chosenUnits:d.units===''?undefined:Number(d.units)},p);
+ const hint=t=>{out.innerHTML='<p class="gb-hint">'+esc(t)+'</p>';};
+ if(!dose){hint('Informe idade e peso compatíveis com a apresentação para visualizar a dose cadastrada.');return;}
+ if(p.context!=='ambulatory'){
+  out.innerHTML='<pre class="gb-preview">'+esc(r.verb+' '+fmt(dose.units)+' '+core.prescription.abbreviation(dose.unit)+' · '+r.routeText+'.\n'+r.intervalText+'.'+(p.preparation?'\n\n'+p.preparation:''))+'</pre><p class="gb-hint">'+esc(r.maxDoseText)+'</p><p class="gb-hint">Duração e quantidade dependem da avaliação assistencial. Montagem ambulatorial não se aplica.</p>';return;
+ }
+ const manual=root.querySelector('#gb-manual-wrap');if(manual)manual.hidden=d.quantity!=='manual';
+ const validDays=d.days===''||Number.isInteger(Number(d.days))&&Number(d.days)>0&&Number(d.days)<=(r.durationKind==='max7'?7:365);
+ if(!validDays){out.innerHTML='<p class="gb-hint gb-error" role="alert">Informe uma duração inteira entre 1 e '+(r.durationKind==='max7'?7:365)+' dias.</p>';return;}
+ const plan=core.quantity.plan({presentation:p,regimen:r,dose,days:d.days});
+ let dispensing=null;
+ if(d.quantity==='auto')dispensing=core.quantity.select(plan,{kind:'suggested'});
+ else if(d.quantity.startsWith('pack:'))dispensing=core.quantity.select(plan,{kind:'package',size:Number(d.quantity.slice(5))});
+ else if(d.quantity==='manual')dispensing=core.quantity.select(plan,{kind:'manual',amount:Number(d.manual)});
+ const instruction=core.prescription.instruction({medicineId:m.id,route:p.route,verb:r.verb,dose,intervalText:r.intervalText,durationDays:d.days===''?null:Number(d.days)});
+ let item=dispensing?core.prescription.createItem({medicine:m,presentation:p,regimen:r,dose,days:d.days,dispensing}):null;
+ const display=item?core.prescription.formatSections([item]).body.trim():core.prescription.routeName(p.route)+'\n\n1. '+p.label.split(' — ')[0].toUpperCase()+' -------- QUANTIDADE PENDENTE\n   '+instruction;
+ out.innerHTML='<pre class="gb-preview">'+esc(display)+'</pre><p class="gb-hint">'+esc(r.maxDoseText)+'</p>'+(d.quantity==='auto'&&!d.days?'<p class="gb-hint">Informe a duração para calcular a quantidade.</p>':d.quantity.startsWith('pack:')&&!dispensing?'<p class="gb-hint gb-error" role="alert">A embalagem escolhida não cobre a quantidade calculada. Selecione o cálculo pela duração ou informe a quantidade.</p>':d.quantity==='manual'&&!dispensing?'<p class="gb-hint">Informe uma quantidade válida.</p>':'')+(plan.isMaximum&&plan.required!=null?'<p class="gb-hint">Quantidade calculada para o uso máximo do esquema; não indica uso obrigatório.</p>':'');
+}
+root.addEventListener('click',e=>{
+ const med=e.target.closest('[data-med]');if(med){state.open=state.open===med.dataset.med?null:med.dataset.med;renderList();return;}
+ const presentation=e.target.closest('[data-presentation]');if(presentation){state.selections[state.open+'/'+state.pop]=presentation.dataset.presentation;renderList();return;}
+ const pop=e.target.closest('[data-pop]');if(pop){state.pop=pop.dataset.pop;root.querySelectorAll('[data-pop]').forEach(b=>b.setAttribute('aria-pressed',String(b===pop)));root.querySelector('#gb-patient').hidden=state.pop!=='pediatric';renderList();}
+});
+root.addEventListener('input',e=>{
+ if(e.target.id==='gb-search'){state.query=e.target.value;renderList();return;}
+ if(e.target.id==='gb-age'||e.target.id==='gb-weight'){state[e.target.id==='gb-age'?'age':'weight']=e.target.value;renderList();return;}
+ const field=e.target.dataset.field;if(field){const m=medicines.find(x=>x.id===state.open),p=chosen(m);if(p){draft(p)[field]=e.target.value;updateOutput();}}
+});
+renderList();
+})();
+</script>

@@ -29,3 +29,11 @@ O projeto anterior está preservado em:
 JVAC02/GuildBook-Legacy
 
 Esse repositório não é fonte de código para o GuildBook atual.
+
+## Fluxo compacto
+
+A busca por nome ou nome comercial abre as apresentações no próprio medicamento.
+O desenho e as regras aprovadas estão em [docs/COMPACT-FLOW.md](docs/COMPACT-FLOW.md).
+A referência visual foi preservada em `docs/prototypes/guildbook-receita-compacta.html`.
+
+Verificação local: `npm test`, `npm run build` e `npm run test:browser` (requer Playwright e Chromium disponíveis no ambiente).

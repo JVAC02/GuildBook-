@@ -1,9 +1,9 @@
 (() => {
   const ns = globalThis.GuildBookCore ||= {};
   const number = value => new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 }).format(value);
-  const abbreviation = unit => ({ comprimido: 'CP', cápsula: 'CAP', ampola: 'AMP', 'frasco-ampola': 'FR', mL: 'mL', g: 'G', gotas: 'GOTAS' })[unit] || unit.toUpperCase();
+  const abbreviation = unit => ns.quantity.abbreviation(unit).toUpperCase();
   const routeName = route => ({ oral: 'USO ORAL', tópica: 'USO TÓPICO', intramuscular: 'USO INTRAMUSCULAR', intravenosa: 'USO INTRAVENOSO', inalatória: 'USO INALATÓRIO', nasal: 'USO NASAL', oftálmica: 'USO OFTÁLMICO', otológica: 'USO OTOLÓGICO', vaginal: 'USO VAGINAL' })[route] || `USO ${route.toUpperCase()}`;
-  const doseAmount = value => Number.isInteger(value) && value < 10 ? String(value).padStart(2, '0') : number(value);
+  const doseAmount = value => number(value);
   function instruction(item) {
     const asNeeded = item.intervalText.endsWith(', se necessário');
     let interval = asNeeded ? item.intervalText.slice(0, -', se necessário'.length) : item.intervalText;
@@ -11,7 +11,7 @@
     const use = item.route === 'tópica'
       ? `Aplicar na área afetada ${interval}`
       : `${item.verb} ${doseAmount(item.dose.units)} ${abbreviation(item.dose.unit)} ${interval}`;
-    return `${use}${item.durationDays ? ` por ${item.durationDays} ${item.durationDays === 1 ? 'dia' : 'dias'}` : ''}${asNeeded ? ' se necessário' : ''}.`.toUpperCase();
+    return `${use}${item.durationDays && item.durationPurpose !== 'quantity' ? ` por ${item.durationDays} ${item.durationDays === 1 ? 'dia' : 'dias'}` : ''}${asNeeded ? ` se ${item.asNeededReason || 'necessário'}` : ''}.`.toUpperCase();
   }
   function createItem({ medicine, presentation, regimen, dose, days, dispensing }) {
     if (!medicine || !presentation || !regimen || !dose || presentation.context !== 'ambulatory' || !dispensing || !(dispensing.quantity > 0)) return null;
@@ -23,6 +23,7 @@
       route: presentation.route, dose: { units: dose.units, unit: dose.unit, mg: dose.mg, volumeMl: dose.volumeMl ?? null },
       intervalText: regimen.intervalText, intervalHours: regimen.intervalHours ?? null,
       durationKind: regimen.durationKind, quantityKind: regimen.quantityKind, verb: regimen.verb || 'Tomar',
+      asNeededReason: regimen.asNeededReason || null, durationPurpose: regimen.durationPurpose || 'treatment',
       durationDays, quantity: dispensing.quantity, quantityUnit: dispensing.unit, quantityText: dispensing.text,
       quantityMethod: dispensing.method, packageSizes: presentation.packageSizes || [], packageUnit: presentation.packageUnit || null,
       packageSizeUnit: presentation.packageSizeUnit || null, quantityPolicy: presentation.quantityPolicy || null,
@@ -49,11 +50,7 @@
   }
   function remove(items, key) { return items.filter(item => item.key !== key); }
   function prescriptionName(item) {
-    const separator = item.label.lastIndexOf(' — ');
-    if (separator < 0) return item.label;
-    const suffix = item.label.slice(separator + 3);
-    const dosageForm = /^(?:comprimidos?|cápsulas?|gotas?|solução|suspensão|gel|creme|pomada|xarope|spray|aerossol|colírio|ampolas?|frascos?|envelopes?|sachês?)(?:\s|$)/i;
-    return dosageForm.test(suffix) ? item.label.slice(0, separator) : item.label;
+    return item.label.split(' — ')[0];
   }
   function formatSections(items, patient = '', details = {}) {
     const title = 'RECEITUÁRIO SIMPLES\n\n';
@@ -63,7 +60,7 @@
     for (const route of routes) {
       parts.push(routeName(route), '');
       items.filter(item => item.route === route).forEach((item, index) => {
-        const amount = item.quantityText ? item.quantityText.toUpperCase() : item.quantity == null ? 'QUANTIDADE PENDENTE' : ns.quantity.measure(item.quantity, item.quantityUnit).toUpperCase();
+        const amount = item.quantityText || (item.quantity == null ? 'QUANTIDADE PENDENTE' : ns.quantity.measure(item.quantity, item.quantityUnit));
         const name = `${index + 1}. ${prescriptionName(item).toUpperCase()}`;
         const dashes = '-'.repeat(Math.max(4, 40 - name.length - 2));
         parts.push(`${name} ${dashes} ${amount}`, `   ${item.instruction}`, '');
@@ -86,5 +83,5 @@
     return { title, intro, body, footer };
   }
   function format(items, patient = '', details = {}) { return Object.values(formatSections(items, patient, details)).join(''); }
-  ns.prescription = { createItem, updateItem, upsert, remove, format, formatSections, instruction, abbreviation, routeName };
+  ns.prescription = { createItem, updateItem, upsert, remove, format, formatSections, instruction, abbreviation, routeName, prescriptionName };
 })();

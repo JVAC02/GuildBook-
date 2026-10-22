@@ -15,3 +15,7 @@ Cada apresentação possui seus próprios `regimens`, `sourceIds` e, quando conf
 `quantityPolicy` aceita `calculate`, `manual` ou `none`. Se ausente, o motor usa `regimen.quantityKind`: `facility` não gera dispensação, `variable` pede escolha e os demais calculam somente com dose, intervalo e duração válidos. Quando há tamanhos cadastrados, o cálculo sugere a menor combinação suficiente. Sem cálculo, nenhuma embalagem é selecionada: o prescritor escolhe uma opção gerada de `packageSizes` ou informa quantidade manual. `canFractionate` libera quantidade fracionária de sólidos somente quando confirmada.
 
 Para ampliar o catálogo, acrescentar dados e fontes da apresentação, registrar o medicamento em `index.json` e criar testes de elegibilidade, dose e quantidade pertinentes. Não alterar dados clínicos para fazer testes passarem.
+
+### Texto sintomático e período de cálculo
+
+O regime pode informar `asNeededReason` (por exemplo, `dor ou febre`) e `durationPurpose: "quantity"`. Nesse caso, o período continua alimentando o cálculo de dispensação, mas não aparece como tratamento obrigatório por X dias. Não inferir essas regras pelo nome do medicamento. Forma, via e liberação permanecem nos dados; a linha compacta da receita usa o composto e a concentração do rótulo.
